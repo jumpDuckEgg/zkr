@@ -192,6 +192,23 @@
                 <el-button size="mini" type="danger" @click="cancelSubmit('form')">取 消</el-button>
             </span>
         </el-dialog>
+        <el-dialog :visible.sync="showPersonVisible" width="800px" center>
+            <div class="dialog-title">用户详情</div>
+            <el-row>
+                <el-col :span="4"><img src="https://img.alicdn.com/tfs/TB1nf.WjyqAXuNjy1XdXXaYcVXa-245-245.gif" alt="" class="userImage"></el-col>
+                <el-col :span="10">
+                    <div>
+                        <svg-icon icon-class='account' style="color:#a7a7a7"></svg-icon>
+                        姓名：{{multipleSelection[0]?multipleSelection[0].name:''}}
+                    </div>
+                    <div>
+                        <svg-icon icon-class='bussiness-card' style="color:#a7a7a7"></svg-icon>
+                        身份证号：{{multipleSelection[0]?multipleSelection[0].idCardNo:''}}
+                    </div>
+                </el-col>
+            </el-row>
+            <div style="border-top: 2px dotted #eeeeee"></div>
+        </el-dialog>
     </div>
 </template>
 
@@ -286,7 +303,8 @@ export default {
             trigger: "change"
           }
         ]
-      }
+      },
+      showPersonVisible: false
     };
   },
   filters: {},
@@ -326,6 +344,7 @@ export default {
         });
         return false;
       }
+      this.showPersonVisible = true;
     }
   }
 };
@@ -353,6 +372,12 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.userImage {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #eeeeee;
 }
 </style>
 

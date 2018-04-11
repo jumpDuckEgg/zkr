@@ -79,7 +79,7 @@ export const constantRouterMap = [
         path: 'index',
         name: 'user',
         component: () => import('@/views/user/index'),
-        meta: { title: '用户管理', icon: 'form' }
+        meta: { title: '用户管理', icon: 'bussiness-man' }
       }
     ]
   },
@@ -91,7 +91,19 @@ export const constantRouterMap = [
         path: 'index',
         name: 'personManager',
         component: () => import('@/views/personManager/index'),
-        meta: { title: '人员管理', icon: 'form' }
+        meta: { title: '人员管理', icon: 'personal-center' }
+      }
+    ]
+  },
+  {
+    path: '/record',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'record',
+        component: () => import('@/views/record/index'),
+        meta: { title: '备案管理', icon: 'gonglue' }
       }
     ]
   },

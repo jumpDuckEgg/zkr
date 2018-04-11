@@ -13,7 +13,7 @@
         </el-row>
         <el-row type="flex" justify="start">
             <el-col>
-                <el-button size="mini" type="primary" plain @click="dialogVisible=true">新增人员</el-button>
+                <el-button size="mini" type="primary" plain @click="createdPerson">新增人员</el-button>
                 <el-button size="mini" type="success" plain @click="modifyPerson">修改人员</el-button>
                 <el-button size="mini" type="info" plain @click="deletePerson">删除人员</el-button>
                 <el-button size="mini" type="danger" plain @click="showPerson">预览</el-button>
@@ -83,7 +83,7 @@
         </div>
         <!-- 新增用户 -->
         <el-dialog :visible.sync="dialogVisible" width="1100px" :close-on-click-modal="false" center lock-scroll>
-            <div class="dialog-title">新增人员</div>
+            <div class="dialog-title">{{dialogTitle}}</div>
             <el-form ref="form" :model="form" :rules="rules" label-width="120px" :inline="true">
                 <el-form-item label="姓名:" prop="name">
                     <el-input size="mini" v-model="form.name" clearable class="input_width"></el-input>
@@ -194,8 +194,8 @@
         </el-dialog>
         <el-dialog :visible.sync="showPersonVisible" width="800px" center>
             <div class="dialog-title">用户详情</div>
-            <el-row>
-                <el-col :span="4"><img src="https://img.alicdn.com/tfs/TB1nf.WjyqAXuNjy1XdXXaYcVXa-245-245.gif" alt="" class="userImage"></el-col>
+            <el-row class="userInfo-title">
+                <el-col :span="4"><img :src="user" alt="userImage" class="userImage"></el-col>
                 <el-col :span="10">
                     <div>
                         <svg-icon icon-class='account' style="color:#a7a7a7"></svg-icon>
@@ -205,179 +205,270 @@
                         <svg-icon icon-class='bussiness-card' style="color:#a7a7a7"></svg-icon>
                         身份证号：{{multipleSelection[0]?multipleSelection[0].idCardNo:''}}
                     </div>
+                    <div>
+                        <svg-icon icon-class='attachment' style="color:#a7a7a7"></svg-icon>
+                        学历：{{multipleSelection[0]?multipleSelection[0].diploma:''}}
+                    </div>
+                    <div>
+                        <svg-icon icon-class='personal-center' style="color:#a7a7a7"></svg-icon>
+                        当前职位：{{multipleSelection[0]?multipleSelection[0].currentPosition:''}}
+                    </div>
                 </el-col>
             </el-row>
             <div style="border-top: 2px dotted #eeeeee"></div>
+            <div class="userInfo-content">
+                <el-row class="userInfo-content__item">
+                    <el-col :span="8">
+                        <svg-icon icon-class='clock' style="color:#a7a7a7"></svg-icon>身份证有效期：{{multipleSelection[0]?multipleSelection[0].idCardNoTime:''}}</el-col>
+                    <el-col :span="8">
+                        <svg-icon icon-class='gonglue' style="color:#a7a7a7"></svg-icon>学位：{{multipleSelection[0]?multipleSelection[0].degree:''}}</el-col>
+                    <el-col :span="8">
+                        <svg-icon icon-class='gonglue' style="color:#a7a7a7"></svg-icon>职称：{{multipleSelection[0]?multipleSelection[0].title:''}}</el-col>
+                </el-row>
+                <el-row class="userInfo-content__item">
+                    <el-col :span="8">
+                        <svg-icon icon-class='gonglue' style="color:#a7a7a7"></svg-icon>等级：{{multipleSelection[0]?multipleSelection[0].grade:''}}</el-col>
+                    <el-col :span="8">
+                        <svg-icon icon-class='gonglue' style="color:#a7a7a7"></svg-icon>类型：{{multipleSelection[0]?multipleSelection[0].type:''}}</el-col>
+                    <el-col :span="8">
+                        <svg-icon icon-class='gonglue' style="color:#a7a7a7"></svg-icon>执业资格：{{multipleSelection[0]?multipleSelection[0].qualification:''}}</el-col>
+                </el-row>
+                <el-row class="userInfo-content__item">
+                    <el-col :span="8">
+                        <svg-icon icon-class='clock' style="color:#a7a7a7"></svg-icon>注册有效期：{{multipleSelection[0]?multipleSelection[0].registerTime:''}}</el-col>
+                    <el-col :span="8">
+                        <svg-icon icon-class='house' style="color:#a7a7a7"></svg-icon>社保所在地：{{multipleSelection[0]?multipleSelection[0].socialSecurity:''}}</el-col>
+                    <el-col :span="8">
+                        <svg-icon icon-class='house-line' style="color:#a7a7a7"></svg-icon>社保号：{{multipleSelection[0]?multipleSelection[0].socialId:''}}</el-col>
+                </el-row>
+                <el-row>
+                    <el-col class="userInfo-content__item">
+                        <svg-icon icon-class='feiji' style="color:#a7a7a7"></svg-icon>毕业信息：{{multipleSelection[0]?multipleSelection[0].graduationInfo:''}}</el-col>
+                    <el-col class="userInfo-content__item">
+                        <svg-icon icon-class='attachment' style="color:#a7a7a7"></svg-icon>获奖情况：{{multipleSelection[0]?multipleSelection[0].winnings:''}}</el-col>
+                    <el-col class="userInfo-content__item">
+                        <svg-icon icon-class='text' style="color:#a7a7a7"></svg-icon>备注：{{multipleSelection[0]?multipleSelection[0].remark:''}}</el-col>
+                </el-row>
+            </div>
         </el-dialog>
     </div>
 </template>
 
 <script>
 import { getPersonManagers } from "@/api/personManager";
-
+import user from "@/assets/user/user.gif";
 export default {
-  data() {
-    return {
-      searchText: "",
-      select: "",
-      multipleSelection: [],
-      tableData: [
-        {
-          name: "欧阳震华",
-          idCardNo: "441522199610300633",
-          idCardNoTime: "2018-10-10",
-          graduationInfo: "广州大学华软软件学院",
-          diploma: "专科",
-          degree: "学士",
-          title: "初级工程师",
-          grade: "助理级",
-          type: "隧道",
-          qualification: "造价",
-          registerTime: "2018-10-10",
-          currentPosition: "初级工程师",
-          socialSecurity: "分院",
-          socialId: "441522199610306333",
-          winnings: "获得了土木建筑一等奖",
-          remark: "备注备注"
+    data() {
+        return {
+            user,
+            dialogTitle: "新增人员",
+            searchText: "",
+            select: "",
+            multipleSelection: [],
+            tableData: [
+                {
+                    name: "欧阳震华",
+                    idCardNo: "441522199610300633",
+                    idCardNoTime: "2018-10-10",
+                    graduationInfo: "广州大学华软软件学院",
+                    diploma: "专科",
+                    degree: "学士",
+                    title: "初级工程师",
+                    grade: "助理级",
+                    type: "隧道",
+                    qualification: "造价",
+                    registerTime: "2018-10-10",
+                    currentPosition: "初级工程师",
+                    socialSecurity: "分院",
+                    socialId: "441522199610306333",
+                    winnings: "获得了土木建筑一等奖",
+                    remark: "备注备注"
+                },
+                {
+                    name: "刘德华",
+                    idCardNo: "441522199610300633",
+                    idCardNoTime: "2018-10-10",
+                    graduationInfo: "广州大学华软软件学院",
+                    diploma: "专科",
+                    degree: "学士",
+                    title: "初级工程师",
+                    grade: "助理级",
+                    type: "隧道",
+                    qualification: "造价",
+                    registerTime: "2018-10-10",
+                    currentPosition: "初级工程师",
+                    socialSecurity: "分院",
+                    socialId: "441522199610306333",
+                    winnings: "获得了土木建筑一等奖",
+                    remark: "备注备注"
+                }
+            ],
+            loading: false,
+            total: 0,
+            pageSize: 5,
+            dialogVisible: false,
+            form: {
+                name: "",
+                idCardNo: "",
+                idCardNoTime: "",
+                graduationInfo: "",
+                diploma: "",
+                degree: "",
+                title: "",
+                grade: "",
+                type: "",
+                qualification: "",
+                registerTime: "",
+                currentPosition: "",
+                socialSecurity: "",
+                socialId: "",
+                winnings: "",
+                remark: ""
+            },
+            rules: {
+                name: [
+                    {
+                        required: true,
+                        message: "请输入姓名",
+                        trigger: "blur"
+                    }
+                ],
+                idCardNo: [
+                    {
+                        required: true,
+                        message: "请输入身份证",
+                        trigger: "blur"
+                    }
+                ],
+                idCardNoTime: [
+                    {
+                        required: true,
+                        message: "请选择有效时间",
+                        trigger: "change"
+                    }
+                ]
+            },
+            showPersonVisible: false
+        };
+    },
+    filters: {},
+    created() {},
+    methods: {
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
         },
-        {
-          name: "欧阳震华",
-          idCardNo: "441522199610300633",
-          idCardNoTime: "2018-10-10",
-          graduationInfo: "广州大学华软软件学院",
-          diploma: "专科",
-          degree: "学士",
-          title: "初级工程师",
-          grade: "助理级",
-          type: "隧道",
-          qualification: "造价",
-          registerTime: "2018-10-10",
-          currentPosition: "初级工程师",
-          socialSecurity: "分院",
-          socialId: "441522199610306333",
-          winnings: "获得了土木建筑一等奖",
-          remark: "备注备注"
+        handleCurrentChange(val) {},
+        createdPerson() {
+            this.dialogTitle = "新增人员";
+            this.dialogVisible = true;
+        },
+        cancelSubmit(formName) {
+            this.$refs[formName].resetFields();
+            for (let value in this.form) {
+                this.form[value] = "";
+            }
+            this.dialogVisible = false;
+        },
+        modifyPerson() {
+            if (!(this.multipleSelection.length == 1)) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个人员进行修改"
+                });
+                return false;
+            }
+            for (let value in this.form) {
+                this.form[value] = this.multipleSelection[0][value]
+                    ? this.multipleSelection[0][value]
+                    : "";
+            }
+            this.dialogTitle = "修改人员";
+            this.dialogVisible = true;
+        },
+        deletePerson() {
+            if (this.multipleSelection.length == 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择至少一个人员进行删除"
+                });
+                return false;
+            }
+            this.$confirm("此操作将永久删除该人员信息, 是否继续?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+            })
+                .then(() => {
+                    this.$message({
+                        type: "success",
+                        message: "删除成功!"
+                    });
+                })
+                .catch(() => {
+                    this.$message({
+                        type: "info",
+                        message: "已取消删除"
+                    });
+                });
+        },
+        showPerson() {
+            if (!(this.multipleSelection.length == 1)) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个人员进行查看"
+                });
+                return false;
+            }
+            this.showPersonVisible = true;
         }
-      ],
-      loading: false,
-      total: 0,
-      pageSize: 5,
-      dialogVisible: false,
-      form: {
-        name: "",
-        idCardNo: "",
-        idCardNoTime: "",
-        graduationInfo: "",
-        diploma: "",
-        degree: "",
-        title: "",
-        grade: "",
-        type: "",
-        qualification: "",
-        registerTime: "",
-        currentPosition: "",
-        socialSecurity: "",
-        socialId: "",
-        winnings: "",
-        remark: ""
-      },
-      rules: {
-        name: [
-          {
-            required: true,
-            message: "请输入姓名",
-            trigger: "blur"
-          }
-        ],
-        idCardNo: [
-          {
-            required: true,
-            message: "请输入身份证",
-            trigger: "blur"
-          }
-        ],
-        idCardNoTime: [
-          {
-            required: true,
-            message: "请选择有效时间",
-            trigger: "change"
-          }
-        ]
-      },
-      showPersonVisible: false
-    };
-  },
-  filters: {},
-  created() {},
-  methods: {
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    handleCurrentChange(val) {},
-    cancelSubmit(formName) {
-      this.$refs[formName].resetFields();
-      this.dialogVisible = false;
-    },
-    modifyPerson() {
-      if (!(this.multipleSelection.length == 1)) {
-        this.$message({
-          type: "warning",
-          message: "请选择一个用户进行修改"
-        });
-        return false;
-      }
-    },
-    deletePerson() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个用户进行删除"
-        });
-        return false;
-      }
-    },
-    showPerson() {
-      if (!(this.multipleSelection.length == 1)) {
-        this.$message({
-          type: "warning",
-          message: "请选择一个用户进行查看"
-        });
-        return false;
-      }
-      this.showPersonVisible = true;
     }
-  }
 };
 </script>
 <style lang="scss" scoped>
 .table-box {
-  margin-top: 10px;
-  // width: 776px;
+    margin-top: 10px;
+    // width: 776px;
 }
 .input_width {
-  width: 200px;
+    width: 200px;
 }
 .dialog-title {
-  border-left-width: 4px;
-  border-left-color: deepskyblue;
-  border-left-style: solid;
-  padding-left: 10px;
-  margin-bottom: 20px;
+    border-left-width: 4px;
+    border-left-color: deepskyblue;
+    border-left-style: solid;
+    padding-left: 10px;
+    margin-bottom: 20px;
 }
 .pagination-box {
-  margin: 10px auto;
-  text-align: center;
+    margin: 10px auto;
+    text-align: center;
 }
 .overWord {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .userImage {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 3px solid #eeeeee;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #eeeeee;
+}
+.userInfo {
+    &-title {
+        width: 98%;
+        margin: auto;
+    }
+    &-content {
+        width: 98%;
+        margin: 10px auto;
+        &__item {
+            margin: 5px 0;
+        }
+    }
+}
+.svg-icon {
+    margin-right: 6px;
 }
 </style>
 

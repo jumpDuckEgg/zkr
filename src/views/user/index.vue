@@ -1,81 +1,110 @@
 <template>
-  <div class="app-container">
-    <el-row type="flex" justify="end">
-      <el-col style="width:400px;margin-bottom:10px;">
-        <el-input placeholder="请输入内容" v-model="searchText" class="input-with-select" size='mini'>
-          <el-select v-model="select" slot="prepend" placeholder="请选择" style="width:90px;">
-            <el-option label="姓名" value="1"></el-option>
-            <el-option label="类别" value="2"></el-option>
-          </el-select>
-          <el-button slot="append" icon="el-icon-search"></el-button>
-        </el-input>
-      </el-col>
-    </el-row>
-    <el-row type="flex" justify="start">
-      <el-col>
-        <el-button size="mini" type="primary" plain @click="dialogVisible = true">新增用户</el-button>
-        <el-button size="mini" type="success" plain @click="modifyPassword">修改密码</el-button>
-        <el-button size="mini" type="info" plain>修改权限</el-button>
-        <el-button size="mini" type="danger" plain @click="deleteUser">删除</el-button>
-      </el-col>
-    </el-row>
+    <div class="app-container">
+        <el-row type="flex" justify="end">
+            <el-col style="width:400px;margin-bottom:10px;">
+                <el-input placeholder="请输入内容" v-model="searchText" class="input-with-select" size='mini'>
+                    <el-select v-model="select" slot="prepend" placeholder="请选择" style="width:90px;">
+                        <el-option label="姓名" value="1"></el-option>
+                        <el-option label="类别" value="2"></el-option>
+                    </el-select>
+                    <el-button slot="append" icon="el-icon-search"></el-button>
+                </el-input>
+            </el-col>
+        </el-row>
+        <el-row type="flex" justify="start">
+            <el-col>
+                <el-button size="mini" type="primary" plain @click="createdUser">新增用户</el-button>
+                <el-button size="mini" type="success" plain @click="modifyPassword">修改密码</el-button>
+                <el-button size="mini" type="info" plain @click="modifyType">修改权限</el-button>
+                <el-button size="mini" type="danger" plain @click="deleteUser">删除</el-button>
+            </el-col>
+        </el-row>
 
-    <div class="table-box">
-      <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="userName" label="姓名" width="80">
-        </el-table-column>
-        <el-table-column prop="type" label="类型" width="90">
-        </el-table-column>
-        <el-table-column label="创建时间" width="180">
-          <template slot-scope="scope">
-            <el-tag size='mini'>{{scope.row.createDate}}</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="备注" width="180">
-          <template slot-scope="scope">
-            <div class="overWord">
-              {{scope.row.remark}}
+        <div class="table-box">
+            <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="55"></el-table-column>
+                <el-table-column prop="userName" label="姓名" width="80">
+                </el-table-column>
+                <el-table-column prop="type" label="类型" width="90">
+                </el-table-column>
+                <el-table-column label="创建时间" width="180">
+                    <template slot-scope="scope">
+                        <el-tag size='mini'>{{scope.row.createDate}}</el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="备注" width="180">
+                    <template slot-scope="scope">
+                        <div class="overWord">
+                            {{scope.row.remark}}
+                        </div>
+                        <el-tag class="detail" size="mini" @click.native="showDetail(scope.row.remark)">详情</el-tag>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination-box">
+                <el-pagination small layout="prev, pager, next" :total="total" :page-size="pageSize" @current-change="handleCurrentChange">
+                </el-pagination>
             </div>
-            <el-tag class="detail" size="mini" @click.native="showDetail(scope.row.remark)">详情</el-tag>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="pagination-box">
-        <el-pagination small layout="prev, pager, next" :total="total" :page-size="pageSize" @current-change="handleCurrentChange">
-        </el-pagination>
-      </div>
 
+        </div>
+        <!-- 新增用户 -->
+        <el-dialog :visible.sync="dialogVisible" width="350px" center lock-scroll :close-on-click-modal="false">
+            <div class="dialog-title">新增用户</div>
+            <el-form ref="form" :model="form" :rules="rules" label-width="70px">
+                <el-form-item label="姓名：" prop="name">
+                    <el-input size="mini" v-model="form.name" clearable class="input_width"></el-input>
+                </el-form-item>
+                <el-form-item label="类型：" prop="type">
+                    <el-select size="mini" v-model="form.type" placeholder="请选择" class="input_width">
+                        <el-option label="普通用户" value="普通用户"></el-option>
+                        <el-option label="超级管理员" value="超级管理员"></el-option>
+                        <el-option label="管理员" value="管理员"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="密码：" prop="password">
+                    <el-input size="mini" v-model="form.password" class="input_width" type="password" ref="password">
+                        <i class="el-icon-view el-input__icon" slot="suffix" @mousedown="showPass" @mouseup="hidePass"></i>
+                    </el-input>
+                </el-form-item>
+                <el-form-item label="备注：" prop="remark">
+                    <el-input size="mini" type="textarea" v-model="form.remark" clearable class="input_width"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="submitUser('form')" size="mini" v-loading='submitFlag'>确 定</el-button>
+                <el-button @click="cancelAddUser" size="mini" type="danger" v-loading='submitFlag'>取 消</el-button>
+            </span>
+        </el-dialog>
+        <!-- 修改信息 -->
+        <el-dialog :visible.sync="modifyDialogVisible" width="350px" center lock-scroll :close-on-click-modal="false">
+            <div class="dialog-title">{{dialogTitle}}</div>
+            <el-form ref="mdform" :model="mdform" :rules="mdrules" label-width="90px">
+                <template v-if="dialogTitle == '修改权限'">
+                    <el-form-item label="类型：" prop="type">
+                        <el-select size="mini" v-model="mdform.type" placeholder="请选择" class="input_width">
+                            <el-option label="普通用户" value="普通用户"></el-option>
+                            <el-option label="超级管理员" value="超级管理员"></el-option>
+                            <el-option label="管理员" value="管理员"></el-option>
+                        </el-select>
+                    </el-form-item>
+                </template>
+                <template v-if="dialogTitle == '修改密码'">
+                    <el-form-item label="密码：" prop="password">
+                        <el-input size="mini" v-model="mdform.password" class="input_width" type="password">
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="确认密码：" prop="checkpassword">
+                        <el-input size="mini" v-model="mdform.checkpassword" class="input_width" type="password">
+                        </el-input>
+                    </el-form-item>
+                </template>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" size="mini" @click="checkModify" v-loading='modifyFlag'>确 定</el-button>
+                <el-button size="mini" type="danger" @click="cancelModify" v-loading='modifyFlag'>取 消</el-button>
+            </span>
+        </el-dialog>
     </div>
-    <!-- 新增用户 -->
-    <el-dialog :visible.sync="dialogVisible" width="350px" center lock-scroll :close-on-click-modal="false">
-      <div class="dialog-title">新增用户</div>
-      <el-form ref="form" :model="form" :rules="rules" label-width="70px">
-        <el-form-item label="姓名：" prop="name">
-          <el-input size="mini" v-model="form.name" clearable class="input_width"></el-input>
-        </el-form-item>
-        <el-form-item label="类型：" prop="type">
-          <el-select size="mini" v-model="form.type" placeholder="请选择" class="input_width">
-            <el-option label="普通用户" value="普通用户"></el-option>
-            <el-option label="超级管理员" value="超级管理员"></el-option>
-            <el-option label="管理员" value="管理员"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="密码：" prop="password">
-          <el-input size="mini" v-model="form.password" class="input_width" type="password" ref="password">
-            <i class="el-icon-view el-input__icon" slot="suffix" @mousedown="showPass" @mouseup="hidePass"></i>
-          </el-input>
-        </el-form-item>
-        <el-form-item label="备注：" prop="remark">
-          <el-input size="mini" type="textarea" v-model="form.remark" clearable class="input_width"></el-input>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitUser('form')" size="mini" v-loading='submitFlag'>确 定</el-button>
-        <el-button @click="cancelAddUser" size="mini" type="danger" v-loading='submitFlag'>取 消</el-button>
-      </span>
-    </el-dialog>
-  </div>
 </template>
 
 <script>
@@ -83,8 +112,19 @@ import { getUsersByPage, createdUser } from "@/api/user.js";
 
 export default {
     data() {
+        var validatePass = (rule, value, callback) => {
+            if (value === "") {
+                callback(new Error("请再次输入密码"));
+            } else if (value !== this.mdform.password) {
+                callback(new Error("两次输入密码不一致!"));
+            } else {
+                callback();
+            }
+        };
         return {
+            dialogTitle: "修改密码",
             submitFlag: false,
+            modifyFlag: false,
             loading: false,
             pageIndex: 1,
             total: 1,
@@ -95,6 +135,7 @@ export default {
             tableData: [],
             multipleSelection: [],
             dialogVisible: false,
+            modifyDialogVisible: false,
             form: {
                 name: "",
                 type: "",
@@ -130,6 +171,28 @@ export default {
                         trigger: "blur"
                     }
                 ]
+            },
+            mdform: {
+                type: "",
+                password: "",
+                checkpassword: ""
+            },
+            mdrules: {
+                type: [
+                    {
+                        required: true,
+                        message: "请选择一个用户类型",
+                        trigger: "change"
+                    }
+                ],
+                password: [
+                    {
+                        required: true,
+                        message: "请输入密码",
+                        trigger: "blur"
+                    }
+                ],
+                checkpassword: [{ validator: validatePass, trigger: "blur" }]
             }
         };
     },
@@ -150,6 +213,12 @@ export default {
             });
     },
     methods: {
+        checkModify() {
+            this.modifyDialogVisible = false;
+        },
+        cancelModify() {
+            this.modifyDialogVisible = false;
+        },
         showDetail(detail) {
             this.$alert(detail, "备注详情", {
                 confirmButtonText: "确定",
@@ -159,6 +228,9 @@ export default {
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
+        createdUser() {
+            this.dialogVisible = true;
+        },
         modifyPassword() {
             if (!(this.multipleSelection.length == 1)) {
                 this.$message({
@@ -167,6 +239,19 @@ export default {
                 });
                 return false;
             }
+            this.dialogTitle = "修改密码";
+            this.modifyDialogVisible = true;
+        },
+        modifyType() {
+            if (!(this.multipleSelection.length == 1)) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个用户进行修改"
+                });
+                return false;
+            }
+            this.dialogTitle = "修改权限";
+            this.modifyDialogVisible = true;
         },
         cancelAddUser() {
             this.form.name = "";
@@ -221,7 +306,32 @@ export default {
                 }
             });
         },
-        deleteUser() {},
+        deleteUser() {
+            if (this.multipleSelection.length == 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择至少一个用户进行删除"
+                });
+                return false;
+            }
+            this.$confirm("此操作将永久删除该用户信息, 是否继续?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+            })
+                .then(() => {
+                    this.$message({
+                        type: "success",
+                        message: "删除成功!"
+                    });
+                })
+                .catch(() => {
+                    this.$message({
+                        type: "info",
+                        message: "已取消删除"
+                    });
+                });
+        },
         handleCurrentChange(val) {
             this.loading = true;
             getUsersByPage(val, this.pageSize)

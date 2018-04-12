@@ -82,7 +82,7 @@
             </div>
         </div>
         <!-- 新增业绩 -->
-        <el-dialog :visible.sync="dialogVisible" width="1000px" center lock-scroll top='6vh'>
+        <el-dialog :visible.sync="dialogVisible" width="1000px" center lock-scroll top='2vh'>
             <div class="dialog-title">{{dialogTitle}}</div>
             <el-form ref="form" :model="form" :rules="rules" label-width="120px">
                 <el-row>
@@ -141,6 +141,52 @@
                         <el-checkbox v-for="option in proptypes" :label="option" :key="option">{{option}}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="项目里程：">
+                            <el-input size="mini" v-model="form.projectMileage" clearable class="input_width">
+                                <template slot="append">m</template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="合同额：">
+                            <el-input size="mini" v-model="form.contractPrice" clearable class="input_width">
+                                <template slot="append">元</template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="最大桥梁长度：">
+                            <el-input size="mini" v-model="form.bridgeHeight" clearable class="input_width">
+                                <template slot="append">m</template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="8">
+                        <el-form-item label="建安费：">
+                            <el-input size="mini" v-model="form.builtSafeFee" clearable class="input_width">
+                                <template slot="append">元</template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="最大隧道长度：">
+                            <el-input size="mini" v-model="form.tunnelHeight" clearable class="input_width">
+                                <template slot="append">m</template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                        <el-form-item label="建筑面积：">
+                            <el-input size="mini" v-model="form.builtUpArea" clearable class="input_width">
+                                <template slot="append">㎡</template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
                 <el-form-item label="工作内容：">
                     <el-input size="mini" type="textarea" v-model="form.designWorkDesc" clearable></el-input>
                 </el-form-item>

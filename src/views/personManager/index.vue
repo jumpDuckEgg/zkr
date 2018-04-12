@@ -20,11 +20,21 @@
             </el-col>
         </el-row>
         <div class="table-box">
-            <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange">
+            <el-table v-loading="loading" :data="tableData"  size='mini' border @selection-change="handleSelectionChange" :row-class-name="tableRowClassName">
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="name" label="姓名" width="90">
+                    <template slot-scope="scope">
+                        <div class="overWord hand" @click="handleClipboard(scope.row.name,$event)">
+                            {{scope.row.name}}
+                        </div>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="idCardNo" label="身份证号" width="180">
+                    <template slot-scope="scope">
+                        <div class="overWord hand" @click="handleClipboard(scope.row.idCardNo,$event)">
+                            {{scope.row.idCardNo}}
+                        </div>
+                    </template>
                 </el-table-column>
                 <el-table-column label="身份证有效期" width="130">
                     <template slot-scope="scope">
@@ -33,7 +43,7 @@
                 </el-table-column>
                 <el-table-column label="毕业信息" width="180">
                     <template slot-scope="scope">
-                        <div class="overWord">
+                        <div class="overWord hand" @click="handleClipboard(scope.row.graduationInfo,$event)">
                             {{scope.row.graduationInfo}}
                         </div>
                     </template>
@@ -43,12 +53,22 @@
                 <el-table-column prop="degree" label="学位" width="80">
                 </el-table-column>
                 <el-table-column prop="title" label="职称" width="100">
+                    <template slot-scope="scope">
+                        <div class="overWord hand" @click="handleClipboard(scope.row.title,$event)">
+                            {{scope.row.title}}
+                        </div>
+                    </template>
                 </el-table-column>
                 <el-table-column prop="grade" label="等级" width="80">
                 </el-table-column>
                 <el-table-column prop="type" label="类型" width="80">
                 </el-table-column>
                 <el-table-column prop="qualification" label="执业资格" width="80">
+                    <template slot-scope="scope">
+                        <div class="overWord hand" @click="handleClipboard(scope.row.qualification,$event)">
+                            {{scope.row.qualification}}
+                        </div>
+                    </template>
                 </el-table-column>
                 <el-table-column label="注册有效期" width="130">
                     <template slot-scope="scope">
@@ -257,6 +277,7 @@
 <script>
 import { getPersonManagers } from "@/api/personManager";
 import user from "@/assets/user/user.gif";
+import clipboard from "@/utils/clipboard";
 export default {
     data() {
         return {
@@ -268,6 +289,24 @@ export default {
             tableData: [
                 {
                     name: "欧阳震华",
+                    idCardNo: "441522199610300633",
+                    idCardNoTime: "2018-10-10",
+                    graduationInfo: "广州大学华软软件学院",
+                    diploma: "专科",
+                    degree: "学士",
+                    title: "初级工程师",
+                    grade: "助理级",
+                    type: "隧道",
+                    qualification: "造价",
+                    registerTime: "2018-10-10",
+                    currentPosition: "初级工程师",
+                    socialSecurity: "分院",
+                    socialId: "441522199610306333",
+                    winnings: "获得了土木建筑一等奖",
+                    remark: "备注备注"
+                },
+                {
+                    name: "刘德华",
                     idCardNo: "441522199610300633",
                     idCardNoTime: "2018-10-10",
                     graduationInfo: "广州大学华软软件学院",
@@ -354,6 +393,15 @@ export default {
     filters: {},
     created() {},
     methods: {
+        tableRowClassName({ row, rowIndex }) {
+            if (rowIndex === 1) {
+                return "danger-row";
+            }
+            return "";
+        },
+        handleClipboard(text, event) {
+            clipboard(text, event);
+        },
         handleSelectionChange(val) {
             this.multipleSelection = val;
         },
@@ -469,6 +517,9 @@ export default {
 }
 .svg-icon {
     margin-right: 6px;
+}
+.hand {
+    cursor: pointer;
 }
 </style>
 

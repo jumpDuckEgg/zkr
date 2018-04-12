@@ -107,6 +107,18 @@ export const constantRouterMap = [
       }
     ]
   },
+  {
+    path: '/achievement',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'achievement',
+        component: () => import('@/views/achievement/index'),
+        meta: { title: '业绩管理', icon: 'all' }
+      }
+    ]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

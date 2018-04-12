@@ -55,7 +55,7 @@ const user = {
           resolve(response)
         }).catch(error => {
           reject(error)
-        })
+        });
       })
     },
 

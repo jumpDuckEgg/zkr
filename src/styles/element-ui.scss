@@ -27,3 +27,17 @@
     }
   }
 }
+.el-dialog__header{
+  padding:0;
+}
+.el-dialog--center .el-dialog__header{
+  padding: 0;
+}
+
+.el-table .warning-row {
+    background: oldlace;
+}
+
+.el-table .danger-row {
+  background: #fbc4c4;
+}

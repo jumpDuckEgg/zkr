@@ -82,7 +82,7 @@
             </div>
         </div>
         <!-- 新增业绩 -->
-        <el-dialog :visible.sync="dialogVisible" width="1000px" center lock-scroll top='2vh'>
+        <el-dialog :visible.sync="dialogVisible" width="1000px" center lock-scroll top='5vh'>
             <div class="dialog-title">{{dialogTitle}}</div>
             <el-form ref="form" :model="form" :rules="rules" label-width="120px">
                 <el-row>
@@ -141,70 +141,101 @@
                         <el-checkbox v-for="option in proptypes" :label="option" :key="option">{{option}}</el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
+
                 <el-row>
-                    <el-col :span="8">
+                    <el-col :span="12">
+                        <el-form-item label="项目负责人：">
+                            <el-input size="mini" v-model="form.projectLeader" clearable class="input_width"></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="分项负责人：">
+                            <editor ref="itemLeader" key="itemLeader" toolbarName ='itemLeader'></editor>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="6">
                         <el-form-item label="项目里程：">
-                            <el-input size="mini" v-model="form.projectMileage" clearable class="input_width">
+                            <el-input size="mini" v-model="form.projectMileage" clearable class="input_widthV2">
                                 <template slot="append">m</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="合同额：">
-                            <el-input size="mini" v-model="form.contractPrice" clearable class="input_width">
+                            <el-input size="mini" v-model="form.contractPrice" clearable class="input_widthV2">
                                 <template slot="append">元</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="最大桥梁长度：">
-                            <el-input size="mini" v-model="form.bridgeHeight" clearable class="input_width">
+                            <el-input size="mini" v-model="form.bridgeHeight" clearable class="input_widthV2">
                                 <template slot="append">m</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="建安费：">
-                            <el-input size="mini" v-model="form.builtSafeFee" clearable class="input_width">
+                            <el-input size="mini" v-model="form.builtSafeFee" clearable class="input_widthV2">
                                 <template slot="append">元</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="最大隧道长度：">
-                            <el-input size="mini" v-model="form.tunnelHeight" clearable class="input_width">
+                            <el-input size="mini" v-model="form.tunnelHeight" clearable class="input_widthV2">
                                 <template slot="append">m</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="6">
                         <el-form-item label="建筑面积：">
-                            <el-input size="mini" v-model="form.builtUpArea" clearable class="input_width">
+                            <el-input size="mini" v-model="form.builtUpArea" clearable class="input_widthV2">
                                 <template slot="append">㎡</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-form-item label="工作内容：">
-                    <el-input size="mini" type="textarea" v-model="form.designWorkDesc" clearable></el-input>
-                </el-form-item>
-                <el-form-item label="项目规模：">
-                    <el-input size="mini" type="textarea" v-model="form.projectScaleDesc" clearable></el-input>
-                </el-form-item>
-                <el-form-item label="桥梁相关描述：">
-                    <el-input size="mini" type="textarea" v-model="form.bridgeDesc" clearable></el-input>
-                </el-form-item>
-                <el-form-item label="隧道相关描述：">
-                    <el-input size="mini" type="textarea" v-model="form.tunnelDesc" clearable></el-input>
-                </el-form-item>
-                <el-form-item label="其他相关描述：">
-                    <el-input size="mini" type="textarea" v-model="form.otherDesc" clearable></el-input>
-                </el-form-item>
-                <el-form-item label="备注：">
-                    <el-input size="mini" type="textarea" v-model="form.remark" clearable></el-input>
-                </el-form-item>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="工作内容：">
+                            <el-input size="mini" type="textarea" v-model="form.designWorkDesc" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="项目规模：">
+                            <el-input size="mini" type="textarea" v-model="form.projectScaleDesc" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="桥梁相关描述：">
+                            <el-input size="mini" type="textarea" v-model="form.bridgeDesc" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="隧道相关描述：">
+                            <el-input size="mini" type="textarea" v-model="form.tunnelDesc" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span="12">
+                        <el-form-item label="备注：">
+                            <el-input size="mini" type="textarea" v-model="form.remark" clearable></el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-form-item label="其他相关描述：">
+                            <editor ref="otherDesc" key="otherDesc" toolbarName ='otherDesc' ></editor>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
 
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -217,118 +248,127 @@
 
 <script>
 import { getPersonManagers } from "@/api/personManager";
-
+import editor from "@/components/editor";
 export default {
-  data() {
-    return {
-      gongkeOptions: ["工可", "勘察", "初步设计", "施工图设计", "咨询"],
-      material: [
-        "初步设计批复",
-        "施工图设计批复",
-        "参加人员证明",
-        "项目评定表"
-      ],
-      proptypes: [
-        "特大桥",
-        "互通立交",
-        "安全设施",
-        "机电工程",
-        "综合管廊",
-        "特殊土质",
-        "绿化",
-        "房建"
-      ],
-      dialogTitle: "新增业绩",
-      searchText: "",
-      select: "",
-      multipleSelection: [],
-      tableData: [
-        {
-          name: "大型电视连续剧《西游记》剧组投资项目",
-          type: "市政工程",
-          projectLeader: "唐僧",
-          itemLeader: "孙悟空",
-          biddingTime: "2018-10-10",
-          contractTime: "2018-10-10",
-          firstConfirmTime: "2018-10-10",
-          confirmTime: "2018-10-10",
-          designWorkDesc: "主要是孙悟空、猪八戒、沙和尚以及唐僧等人到西天取经",
-          projectScaleDesc: "大型电视连续剧",
-          remark: "真是太厉害啦，啊哈哈哈哈哈哈哈哈"
-        }
-      ],
-      loading: false,
-      total: 0,
-      pageSize: 5,
-      dialogVisible: false,
-      form: {
-        name: "",
-        type: "",
-        biddingTime: "",
-        contractTime: "",
-        firstConfirmTime: "",
-        confirmTime: "",
-        checkedGongke: [],
-        checkedMaterial: [],
-        proptypes: [],
-        designWorkDesc: "",
-        projectScaleDesc: "",
-        bridgeDesc: "",
-        tunnelDesc: "",
-        otherDesc: "",
-        remark: ""
-      },
-      rules: {
-        name: [
-          {
-            required: true,
-            message: "请输入姓名",
-            trigger: "blur"
-          }
-        ],
-        type: [
-          {
-            required: true,
-            message: "请选择一个类型",
-            trigger: "change"
-          }
-        ]
-      }
-    };
-  },
-  filters: {},
-  created() {},
-  methods: {
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
+    components: {
+        editor
     },
-    handleCurrentChange(val) {}
-  }
+    data() {
+        return {
+            gongkeOptions: ["工可", "勘察", "初步设计", "施工图设计", "咨询"],
+            material: [
+                "初步设计批复",
+                "施工图设计批复",
+                "参加人员证明",
+                "项目评定表"
+            ],
+            proptypes: [
+                "特大桥",
+                "互通立交",
+                "安全设施",
+                "机电工程",
+                "综合管廊",
+                "特殊土质",
+                "绿化",
+                "房建"
+            ],
+            dialogTitle: "新增业绩",
+            searchText: "",
+            select: "",
+            multipleSelection: [],
+            tableData: [
+                {
+                    name: "大型电视连续剧《西游记》剧组投资项目",
+                    type: "市政工程",
+                    projectLeader: "唐僧",
+                    itemLeader: "孙悟空",
+                    biddingTime: "2018-10-10",
+                    contractTime: "2018-10-10",
+                    firstConfirmTime: "2018-10-10",
+                    confirmTime: "2018-10-10",
+                    designWorkDesc:
+                        "主要是孙悟空、猪八戒、沙和尚以及唐僧等人到西天取经",
+                    projectScaleDesc: "大型电视连续剧",
+                    remark: "真是太厉害啦，啊哈哈哈哈哈哈哈哈"
+                }
+            ],
+            loading: false,
+            total: 0,
+            pageSize: 5,
+            dialogVisible: false,
+            form: {
+                name: "",
+                type: "",
+                biddingTime: "",
+                contractTime: "",
+                firstConfirmTime: "",
+                confirmTime: "",
+                checkedGongke: [],
+                checkedMaterial: [],
+                proptypes: [],
+                projectLeader: "",
+                itemLeader: "",
+                designWorkDesc: "",
+                projectScaleDesc: "",
+                bridgeDesc: "",
+                tunnelDesc: "",
+                otherDesc: "",
+                remark: ""
+            },
+            rules: {
+                name: [
+                    {
+                        required: true,
+                        message: "请输入姓名",
+                        trigger: "blur"
+                    }
+                ],
+                type: [
+                    {
+                        required: true,
+                        message: "请选择一个类型",
+                        trigger: "change"
+                    }
+                ]
+            }
+        };
+    },
+    filters: {},
+    created() {},
+    methods: {
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        handleCurrentChange(val) {}
+    }
 };
 </script>
 <style lang="scss" scoped>
 .table-box {
-  margin-top: 10px;
-  max-width: 1216px;
+    margin-top: 10px;
+    max-width: 1216px;
 }
 .input_width {
-  width: 200px;
+    width: 200px;
+}
+.input_widthV2 {
+    width: 120px;
 }
 .dialog-title {
-  border-left-width: 4px;
-  border-left-color: deepskyblue;
-  border-left-style: solid;
-  padding-left: 10px;
-  margin-bottom: 20px;
+    border-left-width: 4px;
+    border-left-color: deepskyblue;
+    border-left-style: solid;
+    padding-left: 10px;
+    margin-bottom: 20px;
 }
 .pagination-box {
-  margin: 10px auto;
-  text-align: center;
+    margin: 10px auto;
+    text-align: center;
 }
 .overWord {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 </style>
 

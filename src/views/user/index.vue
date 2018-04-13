@@ -4,10 +4,10 @@
             <el-col style="width:400px;margin-bottom:10px;">
                 <el-input placeholder="请输入内容" v-model="searchText" class="input-with-select" size='mini'>
                     <el-select v-model="select" slot="prepend" placeholder="请选择" style="width:90px;">
-                        <el-option label="姓名" value="1"></el-option>
-                        <el-option label="类别" value="2"></el-option>
+                        <el-option label="姓名" value="userName"></el-option>
+                        <el-option label="类型" value="type"></el-option>
                     </el-select>
-                    <el-button slot="append" icon="el-icon-search"></el-button>
+                    <el-button slot="append" icon="el-icon-search" @click="sreachData"></el-button>
                 </el-input>
             </el-col>
         </el-row>
@@ -57,8 +57,8 @@
                 <el-form-item label="类型：" prop="type">
                     <el-select size="mini" v-model="form.type" placeholder="请选择" class="input_width">
                         <el-option label="普通用户" value="普通用户"></el-option>
-                        <el-option label="超级管理员" value="超级管理员"></el-option>
                         <el-option label="管理员" value="管理员"></el-option>
+                        <el-option label="超级管理员" value="超级管理员"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="密码：" prop="password">
@@ -66,7 +66,7 @@
                         <i class="el-icon-view el-input__icon" slot="suffix" @mousedown="showPass" @mouseup="hidePass"></i>
                     </el-input>
                 </el-form-item>
-                <el-form-item label="备注：" prop="remark">
+                <el-form-item label="备注：">
                     <el-input size="mini" type="textarea" v-model="form.remark" clearable class="input_width"></el-input>
                 </el-form-item>
             </el-form>
@@ -100,15 +100,21 @@
                 </template>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" size="mini" @click="checkModify" v-loading='modifyFlag'>确 定</el-button>
-                <el-button size="mini" type="danger" @click="cancelModify" v-loading='modifyFlag'>取 消</el-button>
+                <el-button type="primary" size="mini" @click="checkModify('mdform')" v-loading='modifyFlag'>确 定</el-button>
+                <el-button size="mini" type="danger" @click="cancelModify('mdform')" v-loading='modifyFlag'>取 消</el-button>
             </span>
         </el-dialog>
     </div>
 </template>
 
 <script>
-import { getUsersByPage, createdUser } from "@/api/user.js";
+import {
+    getUsersByPage,
+    createdUser,
+    removeUser,
+    modifyUser,
+    modifyPassword
+} from "@/api/user.js";
 
 export default {
     data() {
@@ -163,13 +169,6 @@ export default {
                         message: "请输入密码",
                         trigger: "blur"
                     }
-                ],
-                remark: [
-                    {
-                        required: true,
-                        message: "请填写备注",
-                        trigger: "blur"
-                    }
                 ]
             },
             mdform: {
@@ -199,7 +198,11 @@ export default {
     filters: {},
     created() {
         this.loading = true;
-        getUsersByPage(this.pageIndex, this.pageSize)
+        let data = {
+            pageIndex: this.pageIndex,
+            pageSize: this.pageSize
+        };
+        getUsersByPage(data)
             .then(res => {
                 if (res.success) {
                     this.tableData = res.result.records;
@@ -213,8 +216,98 @@ export default {
             });
     },
     methods: {
-        checkModify() {
-            this.modifyDialogVisible = false;
+        sreachData() {
+            if (!this.select) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个类型"
+                });
+                return false;
+            }
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize
+            };
+            data[this.select] = this.searchText;
+            getUsersByPage(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        },
+        checkModify(formName) {
+            this.$refs[formName].validate(valid => {
+                if (valid) {
+                    let modifyData = {};
+                    if (this.dialogTitle == "修改密码") {
+                        modifyPassword(
+                            this.mdform.password,
+                            this.multipleSelection[0].id
+                        ).then(res => {
+                            if (res.result) {
+                                this.$message({
+                                    type: "success",
+                                    message: "修改密码成功"
+                                });
+                                this.mdform.password = "";
+                                this.modifyDialogVisible = false;
+                            }
+                        });
+                    }
+                    if (this.dialogTitle == "修改权限") {
+                        this.multipleSelection[0].type = this.mdform.type;
+                        modifyData = this.multipleSelection[0];
+                        modifyUser(modifyData)
+                            .then(res => {
+                                if (res.result) {
+                                    this.$message({
+                                        type: "success",
+                                        message: "修改权限成功"
+                                    });
+                                    this.mdform.type = "";
+                                }
+                            })
+                            .then(() => {
+                                this.loading = true;
+                                let data = {};
+                                this.searchText = "";
+                                data = {
+                                    pageIndex: this.pageIndex,
+                                    pageSize: this.pageSize
+                                };
+                                getUsersByPage(data)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                            this.modifyDialogVisible = false;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                        this.modifyDialogVisible = false;
+                                    });
+                            });
+                    }
+                } else {
+                    console.log("error submit!!");
+                    return false;
+                }
+            });
         },
         cancelModify() {
             this.modifyDialogVisible = false;
@@ -275,7 +368,10 @@ export default {
                                     type: "success",
                                     message: "新增用户成功"
                                 });
-
+                                this.form.name = "";
+                                this.form.type = "";
+                                this.form.password = "";
+                                this.form.remark = "";
                                 this.dialogVisible = false;
                             } else {
                                 this.submitFlag = false;
@@ -285,13 +381,18 @@ export default {
                         })
                         .then(() => {
                             this.loading = true;
-                            getUsersByPage(this.pageIndex, this.pageSize)
+                            let data = {};
+                            this.searchText = "";
+                            data = {
+                                pageIndex: this.pageIndex,
+                                pageSize: this.pageSize
+                            };
+                            getUsersByPage(data)
                                 .then(res => {
                                     if (res.success) {
                                         this.tableData = res.result.records;
                                         this.loading = false;
                                         this.total = Number(res.result.total);
-
                                         this.currentPage = res.result.current;
                                     }
                                 })
@@ -320,10 +421,34 @@ export default {
                 type: "warning"
             })
                 .then(() => {
-                    this.$message({
-                        type: "success",
-                        message: "删除成功!"
+                    let ids = [];
+                    this.multipleSelection.map((value, index) => {
+                        ids.push(value.id);
                     });
+                    removeUser(ids)
+                        .then(res => {
+                            if (res.success) {
+                                this.$message({
+                                    type: "success",
+                                    message: "删除成功!"
+                                });
+                            }
+                        })
+                        .then(() => {
+                            let data = {};
+                            this.searchText = "";
+                            data = {
+                                pageIndex: this.pageIndex,
+                                pageSize: this.pageSize
+                            };
+                            getUsersByPage(data).then(res => {
+                                if (res.success) {
+                                    this.tableData = res.result.records;
+                                    this.total = Number(res.result.total);
+                                    this.currentPage = res.result.current;
+                                }
+                            });
+                        });
                 })
                 .catch(() => {
                     this.$message({
@@ -334,7 +459,16 @@ export default {
         },
         handleCurrentChange(val) {
             this.loading = true;
-            getUsersByPage(val, this.pageSize)
+            let data = {};
+            this.pageIndex = val;
+            data = {
+                pageIndex: this.pageIndex,
+                pageSize: this.pageSize
+            };
+            if (this.select && this.searchText) {
+                data[this.select] = this.searchText;
+            }
+            getUsersByPage(data)
                 .then(res => {
                     if (res.success) {
                         this.tableData = res.result.records;

@@ -189,7 +189,7 @@
                         </el-form-item>
                     </el-col>
                 </el-row>
-                <el-form-item label="合同扫描件:">
+                <el-form-item label="文件上传:">
                     <el-upload class="upload-demo" drag action="https://jsonplaceholder.typicode.com/posts/" multiple>
                         <i class="el-icon-upload"></i>
                         <div class="el-upload__text">将文件拖到此处，或

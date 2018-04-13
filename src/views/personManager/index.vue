@@ -4,8 +4,12 @@
             <el-col style="width:400px;margin-bottom:10px;">
                 <el-input placeholder="请输入内容" v-model="searchText" class="input-with-select" size='mini'>
                     <el-select v-model="select" slot="prepend" placeholder="请选择" style="width:90px;">
-                        <el-option label="姓名" value="1"></el-option>
-                        <el-option label="身份证号" value="2"></el-option>
+                        <el-option label="姓名" value="name"></el-option>
+                        <el-option label="身份证号" value="idCardNo"></el-option>
+                        <el-option label="学位" value="degree"></el-option>
+                        <el-option label="职称" value="title"></el-option>
+                        <el-option label="等级" value="grade"></el-option>
+                        <el-option label="类型" value="type"></el-option>
                     </el-select>
                     <el-button slot="append" icon="el-icon-search"></el-button>
                 </el-input>
@@ -20,7 +24,7 @@
             </el-col>
         </el-row>
         <div class="table-box">
-            <el-table v-loading="loading" :data="tableData"  size='mini' border @selection-change="handleSelectionChange" :row-class-name="tableRowClassName">
+            <el-table v-loading="loading" :data="tableData" size='mini' border @selection-change="handleSelectionChange" :row-class-name="tableRowClassName">
                 <el-table-column type="selection" width="55"></el-table-column>
                 <el-table-column prop="name" label="姓名" width="90">
                     <template slot-scope="scope">
@@ -38,7 +42,7 @@
                 </el-table-column>
                 <el-table-column label="身份证有效期" width="130">
                     <template slot-scope="scope">
-                        {{scope.row.idCardNoTime}}
+                        {{scope.row.idValidityDate}}
                     </template>
                 </el-table-column>
                 <el-table-column label="毕业信息" width="180">
@@ -72,14 +76,14 @@
                 </el-table-column>
                 <el-table-column label="注册有效期" width="130">
                     <template slot-scope="scope">
-                        {{scope.row.registerTime}}
+                        {{scope.row.validityPeriod}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="currentPosition" label="当前职位" width="100">
                 </el-table-column>
                 <el-table-column prop="socialSecurity" label="社保所在地" width="90">
                 </el-table-column>
-                <el-table-column prop="socialId" label="社保号" width="180">
+                <el-table-column prop="socialNo" label="社保号" width="180">
                 </el-table-column>
                 <el-table-column label="获奖情况" width="180">
                     <template slot-scope="scope">
@@ -111,8 +115,8 @@
                 <el-form-item label="身份证号:" prop="idCardNo">
                     <el-input size="mini" v-model="form.idCardNo" clearable class="input_width"></el-input>
                 </el-form-item>
-                <el-form-item label="身份证有效期:" prop="idCardNoTime">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="form.idCardNoTime" class="input_width"></el-date-picker>
+                <el-form-item label="身份证有效期:" prop="idValidityDate">
+                    <el-date-picker type="date" value-format='yyyy-MM-dd HH:mm:ss' placeholder="选择日期" v-model="form.idValidityDate" class="input_width"></el-date-picker>
                 </el-form-item>
 
                 <el-form-item label="学历:" prop="diploma">
@@ -135,15 +139,15 @@
                 <el-form-item label="职称:" prop="title">
                     <el-input size="mini" v-model="form.title" clearable class="input_width"></el-input>
                 </el-form-item>
-                <el-form-item label="等级:" prop="degree">
-                    <el-select size="mini" v-model="form.degree" placeholder="请选择" class="input_width">
+                <el-form-item label="等级:" prop="grade">
+                    <el-select size="mini" v-model="form.grade" placeholder="请选择" class="input_width">
                         <el-option label="助理级" value="助理级"></el-option>
                         <el-option label="中级" value="中级"></el-option>
                         <el-option label="副高级" value="副高级"></el-option>
                         <el-option label="副高级" value="副高级"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="等级:" prop="type">
+                <el-form-item label="类型:" prop="type">
                     <el-select size="mini" v-model="form.type" placeholder="请选择" class="input_width">
                         <el-option label="路桥" value="路桥"></el-option>
                         <el-option label="隧道" value="隧道"></el-option>
@@ -181,8 +185,8 @@
                         <el-option label="安全" value="安全"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="注册有效期:" prop="registerTime">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="form.registerTime" class="input_width"></el-date-picker>
+                <el-form-item label="注册有效期:" prop="validityPeriod">
+                    <el-date-picker type="date" value-format='yyyy-MM-dd HH:mm:ss' placeholder="选择日期" v-model="form.validityPeriod" class="input_width"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="当前职位:" prop="currentPosition">
                     <el-input size="mini" v-model="form.currentPosition" clearable class="input_width"></el-input>
@@ -194,8 +198,8 @@
                         <el-option label="均有" value="均有"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="社保号:" prop="socialId">
-                    <el-input size="mini" v-model="form.socialId" clearable class="input_width"></el-input>
+                <el-form-item label="社保号:" prop="socialNo">
+                    <el-input size="mini" v-model="form.socialNo" clearable class="input_width"></el-input>
                 </el-form-item>
                 <el-form-item label="毕业信息:" prop="graduationInfo">
                     <el-input size="mini" type="textarea" v-model="form.graduationInfo" clearable class="input_width"></el-input>
@@ -208,8 +212,8 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" size="mini">确 定</el-button>
-                <el-button size="mini" type="danger" @click="cancelSubmit('form')">取 消</el-button>
+                <el-button type="primary" size="mini" @click="submitInfo('form')" v-loading='submitFlag'>确 定</el-button>
+                <el-button size="mini" type="danger" @click="cancelSubmit('form')" v-loading='submitFlag'>取 消</el-button>
             </span>
         </el-dialog>
         <el-dialog :visible.sync="showPersonVisible" width="800px" center>
@@ -239,7 +243,7 @@
             <div class="userInfo-content">
                 <el-row class="userInfo-content__item">
                     <el-col :span="8">
-                        <svg-icon icon-class='clock' style="color:#a7a7a7"></svg-icon>身份证有效期：{{multipleSelection[0]?multipleSelection[0].idCardNoTime:''}}</el-col>
+                        <svg-icon icon-class='clock' style="color:#a7a7a7"></svg-icon>身份证有效期：{{multipleSelection[0]?multipleSelection[0].idValidityDate:''}}</el-col>
                     <el-col :span="8">
                         <svg-icon icon-class='gonglue' style="color:#a7a7a7"></svg-icon>学位：{{multipleSelection[0]?multipleSelection[0].degree:''}}</el-col>
                     <el-col :span="8">
@@ -255,11 +259,11 @@
                 </el-row>
                 <el-row class="userInfo-content__item">
                     <el-col :span="8">
-                        <svg-icon icon-class='clock' style="color:#a7a7a7"></svg-icon>注册有效期：{{multipleSelection[0]?multipleSelection[0].registerTime:''}}</el-col>
+                        <svg-icon icon-class='clock' style="color:#a7a7a7"></svg-icon>注册有效期：{{multipleSelection[0]?multipleSelection[0].validityPeriod:''}}</el-col>
                     <el-col :span="8">
                         <svg-icon icon-class='house' style="color:#a7a7a7"></svg-icon>社保所在地：{{multipleSelection[0]?multipleSelection[0].socialSecurity:''}}</el-col>
                     <el-col :span="8">
-                        <svg-icon icon-class='house-line' style="color:#a7a7a7"></svg-icon>社保号：{{multipleSelection[0]?multipleSelection[0].socialId:''}}</el-col>
+                        <svg-icon icon-class='house-line' style="color:#a7a7a7"></svg-icon>社保号：{{multipleSelection[0]?multipleSelection[0].socialNo:''}}</el-col>
                 </el-row>
                 <el-row>
                     <el-col class="userInfo-content__item">
@@ -275,9 +279,15 @@
 </template>
 
 <script>
-import { getPersonManagers } from "@/api/personManager";
+import {
+    getPersonManagers,
+    addPerson,
+    modifyPerson,
+    deletePerson
+} from "@/api/personManager";
 import user from "@/assets/user/user.gif";
 import clipboard from "@/utils/clipboard";
+
 export default {
     data() {
         return {
@@ -286,70 +296,18 @@ export default {
             searchText: "",
             select: "",
             multipleSelection: [],
-            tableData: [
-                {
-                    name: "欧阳震华",
-                    idCardNo: "441522199610300633",
-                    idCardNoTime: "2018-10-10",
-                    graduationInfo: "广州大学华软软件学院",
-                    diploma: "专科",
-                    degree: "学士",
-                    title: "初级工程师",
-                    grade: "助理级",
-                    type: "隧道",
-                    qualification: "造价",
-                    registerTime: "2018-10-10",
-                    currentPosition: "初级工程师",
-                    socialSecurity: "分院",
-                    socialId: "441522199610306333",
-                    winnings: "获得了土木建筑一等奖",
-                    remark: "备注备注"
-                },
-                {
-                    name: "刘德华",
-                    idCardNo: "441522199610300633",
-                    idCardNoTime: "2018-10-10",
-                    graduationInfo: "广州大学华软软件学院",
-                    diploma: "专科",
-                    degree: "学士",
-                    title: "初级工程师",
-                    grade: "助理级",
-                    type: "隧道",
-                    qualification: "造价",
-                    registerTime: "2018-10-10",
-                    currentPosition: "初级工程师",
-                    socialSecurity: "分院",
-                    socialId: "441522199610306333",
-                    winnings: "获得了土木建筑一等奖",
-                    remark: "备注备注"
-                },
-                {
-                    name: "刘德华",
-                    idCardNo: "441522199610300633",
-                    idCardNoTime: "2018-10-10",
-                    graduationInfo: "广州大学华软软件学院",
-                    diploma: "专科",
-                    degree: "学士",
-                    title: "初级工程师",
-                    grade: "助理级",
-                    type: "隧道",
-                    qualification: "造价",
-                    registerTime: "2018-10-10",
-                    currentPosition: "初级工程师",
-                    socialSecurity: "分院",
-                    socialId: "441522199610306333",
-                    winnings: "获得了土木建筑一等奖",
-                    remark: "备注备注"
-                }
-            ],
+            tableData: [],
             loading: false,
             total: 0,
+            pageIndex: 1,
             pageSize: 5,
+            currentPage: 1,
             dialogVisible: false,
+            submitFlag: false,
             form: {
                 name: "",
                 idCardNo: "",
-                idCardNoTime: "",
+                idValidityDate: "",
                 graduationInfo: "",
                 diploma: "",
                 degree: "",
@@ -357,10 +315,10 @@ export default {
                 grade: "",
                 type: "",
                 qualification: "",
-                registerTime: "",
+                validityPeriod: "",
                 currentPosition: "",
                 socialSecurity: "",
-                socialId: "",
+                socialNo: "",
                 winnings: "",
                 remark: ""
             },
@@ -379,7 +337,7 @@ export default {
                         trigger: "blur"
                     }
                 ],
-                idCardNoTime: [
+                idValidityDate: [
                     {
                         required: true,
                         message: "请选择有效时间",
@@ -391,8 +349,85 @@ export default {
         };
     },
     filters: {},
-    created() {},
+    created() {
+        this.loading = true;
+        getPersonManagers(this.pageIndex, this.pageSize)
+            .then(res => {
+                if (res.success) {
+                    this.tableData = res.result.records;
+                    this.loading = false;
+                    this.total = Number(res.result.total);
+                    this.currentPage = res.result.current;
+                }
+            })
+            .catch(err => {
+                this.loading = false;
+            });
+    },
     methods: {
+        submitInfo(formName) {
+            this.$refs[formName].validate(valid => {
+                if (valid) {
+                    let dealFun = function() {};
+                    let submitData = {};
+                    let remindMsg = "";
+                    this.submitFlag = true;
+                    if (this.dialogTitle == "新增人员") {
+                        dealFun = addPerson;
+                        submitData = this.form;
+                        remindMsg = "添加成功";
+                    }
+                    if (this.dialogTitle == "修改人员") {
+                        dealFun = modifyPerson;
+                        for (let val in this.multipleSelection[0]) {
+                            if (this.form[val]) {
+                                this.multipleSelection[0][val] = this.form[val];
+                            }
+                        }
+                        submitData = this.multipleSelection[0];
+                        remindMsg = "修改成功";
+                    }
+
+                    dealFun(submitData)
+                        .then(res => {
+                            if (res.success) {
+                                this.submitFlag = false;
+                                this.dialogVisible = false;
+                                for (let val in this.form) {
+                                    this.form[val] = "";
+                                }
+                            }
+                            return Promise.resolve();
+                        })
+                        .then(() => {
+                            this.$message({
+                                type: "success",
+                                message: remindMsg
+                            });
+                            this.loading = true;
+                            getPersonManagers(this.pageIndex, this.pageSize)
+                                .then(res => {
+                                    if (res.success) {
+                                        this.tableData = res.result.records;
+                                        this.loading = false;
+                                        this.total = Number(res.result.total);
+                                        this.currentPage = res.result.current;
+                                    }
+                                })
+                                .catch(err => {
+                                    this.loading = false;
+                                });
+                        })
+                        .catch(() => {
+                            this.submitFlag = false;
+                        });
+                } else {
+                    console.log("error submit!!");
+
+                    return false;
+                }
+            });
+        },
         tableRowClassName({ row, rowIndex }) {
             if (rowIndex === 1) {
                 return "danger-row";
@@ -404,8 +439,24 @@ export default {
         },
         handleSelectionChange(val) {
             this.multipleSelection = val;
+            console.log(val);
         },
-        handleCurrentChange(val) {},
+        handleCurrentChange(val) {
+            this.pageIndex = val;
+            this.loading = true;
+            getPersonManagers(this.pageIndex, this.pageSize)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        },
         createdPerson() {
             this.dialogTitle = "新增人员";
             this.dialogVisible = true;
@@ -447,10 +498,39 @@ export default {
                 type: "warning"
             })
                 .then(() => {
-                    this.$message({
-                        type: "success",
-                        message: "删除成功!"
+                    let ids = [];
+                    this.multipleSelection.map((value, index) => {
+                        ids.push(value.id);
                     });
+                    this.loading = true;
+                    deletePerson(ids)
+                        .then(res => {
+                            if (res.success) {
+                                this.$message({
+                                    type: "success",
+                                    message: "删除成功!"
+                                });
+                                this.loading = true;
+                                getPersonManagers(this.pageIndex, this.pageSize)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            this.loading = false;
+                        });
                 })
                 .catch(() => {
                     this.$message({

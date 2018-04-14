@@ -1,13 +1,10 @@
 import request from '@/utils/request'
 
-export function getPersonManagers(pageIndex,pageSize) {
+export function getPersonManagers(data) {
     return request({
         url: '/personnel/findPage',
         method: 'get',
-        params: {
-            pageIndex,
-            pageSize
-        }
+        params: data
     })
 }
 

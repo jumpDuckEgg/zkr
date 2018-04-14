@@ -38,17 +38,24 @@ export default {
         toolbarName:{
             type:String,
             default:'toolbar'
+        },
+        parentsContent:{
+            type:String,
+            default:''
         }
     },
     data() {
         return {
-            content: "",
+            content:'',
             editorOption: {
                 modules: {
                     toolbar: '#'+this.toolbarName
                 }
             }
         };
+    },
+    created(){
+        this.content=this.parentsContent
     },
     methods: {
         onEditorBlur(editor) {

@@ -1,5 +1,5 @@
 import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setUserInfo,removeUserInfo } from '@/utils/auth'
 
 const user = {
   state: {
@@ -32,7 +32,16 @@ const user = {
         login(username, userInfo.password).then(response => {
           if (response.success) {
             const token = response.result;
-            setToken(token)
+            setToken(token);
+            if (userInfo.checked) {
+              let data = {
+                username: username,
+                password: userInfo.password
+              }
+              setUserInfo(data);
+            }else{
+              removeUserInfo();
+            }
             commit('SET_TOKEN', token)
             resolve()
           } else {
@@ -65,8 +74,10 @@ const user = {
 
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
-        removeToken()
-        resolve()
+        removeToken();
+       
+        resolve();
+
 
       })
     },

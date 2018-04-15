@@ -16,7 +16,7 @@
             </el-col>
         </el-row>
         <div class="table-box">
-            <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
+            <el-table v-loading="loading" :data="tableData"  size='mini' border @selection-change="handleSelectionChange" :row-class-name="tableRowClassName" @sort-change='tableSort'>
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="region" label="地区" width="80" align="center" sortable='custom'>
                 </el-table-column>
@@ -77,7 +77,7 @@
                 <el-table-column label="办事指南" width="80" align="center">
                     <template slot-scope="scope">
                         <el-tooltip class="item" effect="dark" :content="scope.row.guide" placement="bottom">
-                            <el-button type="danger" plain size="mini">转跳</el-button>
+                            <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.guide)">转跳</el-button>
                         </el-tooltip>
                     </template>
                 </el-table-column>
@@ -413,6 +413,30 @@ export default {
       });
   },
   methods: {
+    tableRowClassName({ row, rowIndex }) {
+      let idValidity = row.validityDate
+        ? row.validityDate.split("-")
+        : "1996-10-30".split("-");
+      let nowDay = new Date(
+        new Date().getFullYear(),
+        new Date().getMonth(),
+        new Date().getDate()
+      );
+      let idValidityDate = new Date(
+        idValidity[0],
+        idValidity[1] - 1,
+        idValidity[2]
+      );
+      let limitTime = 1000 * 60 * 60 * 24 * 60; //两个月
+      if (idValidityDate.getTime() < nowDay.getTime()) {
+        return "danger-row";
+      }
+      if (idValidityDate.getTime() - nowDay.getTime() < limitTime) {
+          console.log("warning-row")
+        return "warning-row";
+      }
+      return "";
+    },
     tableSort(row) {
       let sortData = "";
       if (row.order == "descending") {
@@ -463,7 +487,7 @@ export default {
         });
     },
     turnUrl(url) {
-      window.location.href = "http://" + url;
+      window.open("http://" + url);
     },
     closeDialog() {
       this.$refs["form"].resetFields();

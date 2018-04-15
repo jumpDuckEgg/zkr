@@ -1,7 +1,7 @@
 <template>
     <div class="login-container">
         <el-form autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left" label-width="0px" class="card-box login-form">
-            <h3 class="title">小作坊</h3>
+            <h3 class="title">生产经营部</h3>
             <el-form-item prop="username">
                 <span class="svg-container svg-container_login">
                     <svg-icon icon-class="user" />
@@ -27,8 +27,7 @@
             </el-form-item>
 
             <div class="tips">
-                <span style="margin-right:20px;">用户名: 黄烈全</span>
-                <span> 密码: 123456</span>
+                <span>投标经营，只要一个系统就够了！</span>
             </div>
         </el-form>
     </div>
@@ -147,6 +146,7 @@ $light_gray: #eee;
     font-size: 14px;
     color: #fff;
     margin-bottom: 10px;
+    text-align: center
   }
   .svg-container {
     padding: 6px 5px 6px 15px;

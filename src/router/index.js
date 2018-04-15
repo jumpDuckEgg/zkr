@@ -121,6 +121,30 @@ export const constantRouterMap = [
       }
     ]
   },
+  {
+    path: '/bidding',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'bidding',
+        component: () => import('@/views/bidding/index'),
+        meta: { title: '投标管理', icon: 'feiji' }
+      }
+    ]
+  },
+  {
+    path: '/contract',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'contract',
+        component: () => import('@/views/contract/index'),
+        meta: { title: '合同管理', icon: 'bussiness-card' }
+      }
+    ]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

@@ -466,6 +466,7 @@ export default {
               }
             })
             .then(() => {
+              this.loading = true;
               let data = {};
               this.searchText = "";
               data = {

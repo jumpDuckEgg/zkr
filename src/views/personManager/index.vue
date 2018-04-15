@@ -589,6 +589,7 @@ export default {
         idValidity[1] - 1,
         idValidity[2]
       );
+      let limitTime = 1000 * 60 * 60 * 24 * 60; //两个月
       let validityPeriod = new Date(validity[0], validity[1] - 1, validity[2]);
       if (
         validityPeriod.getTime() < nowDay.getTime() ||
@@ -597,8 +598,8 @@ export default {
         return "danger-row";
       }
       if (
-        validityPeriod.getTime() < nowDay.getTime() ||
-        idValidityDate.getTime() < nowDay.getTime()
+        validityPeriod.getTime() - nowDay.getTime() < limitTime ||
+        idValidityDate.getTime() - nowDay.getTime() < limitTime
       ) {
         return "warning-row";
       }

@@ -16,13 +16,13 @@ export function removeToken() {
 }
 
 export function getUserInfo() {
-  return Cookies.get(UserInfo)
+  return localStorage.getItem(UserInfo)
 }
 
 export function setUserInfo(data) {
-  return Cookies.set(UserInfo, data)
+  return localStorage.setItem(UserInfo, JSON.stringify(data));
 }
 
 export function removeUserInfo() {
-  return Cookies.remove(UserInfo)
+  return localStorage.removeItem(UserInfo)
 }

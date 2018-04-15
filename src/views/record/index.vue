@@ -97,7 +97,7 @@
                 </el-table-column>
             </el-table>
             <div class="pagination-box">
-                <el-pagination background="" layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[ 10, 15, 20]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+                <el-pagination background="" layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[ 10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
                 </el-pagination>
             </div>
         </div>
@@ -348,7 +348,7 @@ export default {
       loading: false,
       total: 0,
       pageIndex: 1,
-      pageSize: 10,
+      pageSize: 15,
       currentPage: 1,
       orderBy: "create_date desc",
       dialogVisible: false,

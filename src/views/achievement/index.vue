@@ -3,7 +3,9 @@
 
         <div class="searchBox">
             <div class="searchBox-title">内容筛选</div>
-            <el-row class="searchBox-item" type="flex" justify="start" style="flex-wrap: wrap">
+            <i class="el-icon-arrow-up search_down" v-if="sreachBoxFlag" @click="sreachBoxFlag = !sreachBoxFlag"></i>
+            <i class="el-icon-arrow-down search_down" v-if="!sreachBoxFlag" @click="sreachBoxFlag = !sreachBoxFlag"></i>
+            <el-row class="searchBox-item" type="flex" justify="start" style="flex-wrap: wrap" v-if="sreachBoxFlag">
                 <el-col style="margin-bottom:10px;width:460px">
                     <div>
                         工程类别：
@@ -94,38 +96,38 @@
                 </el-col>
                 <el-col style="margin-bottom:10px;width:260px;">
                     项目里程大于：
-                    <el-input size="mini" type="number" v-model="searchForm.projectMileage" clearable class="input_widthV2">
-                        <template slot="append">m</template>
+                    <el-input size="mini" type="number" v-model="searchForm.projectMileage" clearable style="width:150px;">
+                        <template slot="append">km</template>
                     </el-input>
                 </el-col>
-                <el-col style="margin-bottom:10px;width:260px;">
+                <el-col style="margin-bottom:10px;width:300px;">
                     <div>
                         合同额大于：
-                        <el-input size="mini" type="number" v-model="searchForm.contractPrice" clearable class="input_widthV2">
+                        <el-input size="mini" type="number" v-model="searchForm.contractPrice" clearable style="width:180px;">
                             <template slot="append">万元</template>
                         </el-input>
                     </div>
                 </el-col>
-                <el-col style="margin-bottom:10px;width:260px;">
+                <el-col style="margin-bottom:10px;width:300px;">
                     <div>
                         最大桥梁长度大于：
-                        <el-input size="mini" type="number" v-model="searchForm.bridgeHeight" clearable class="input_widthV2">
+                        <el-input size="mini" type="number" v-model="searchForm.bridgeHeight" clearable style="width:150px;">
                             <template slot="append">m</template>
                         </el-input>
                     </div>
                 </el-col>
-                <el-col style="margin-bottom:10px;width:260px;">
+                <el-col style="margin-bottom:10px;width:300px;">
                     <div>
                         建安费大于：
-                        <el-input size="mini" type="number" v-model="searchForm.builtSafeFee" clearable class="input_widthV2">
+                        <el-input size="mini" type="number" v-model="searchForm.builtSafeFee" clearable style="width:180px;">
                             <template slot="append">万元</template>
                         </el-input>
                     </div>
                 </el-col>
-                <el-col style="margin-bottom:10px;width:260px;">
+                <el-col style="margin-bottom:10px;width:300px;">
                     <div>
                         最大隧道长度大于：
-                        <el-input size="mini" type="number" v-model="searchForm.tunnelHeight" clearable class="input_widthV2">
+                        <el-input size="mini" type="number" v-model="searchForm.tunnelHeight" clearable style="width:150px;">
                             <template slot="append">m</template>
                         </el-input>
                     </div>
@@ -133,14 +135,15 @@
                 <el-col style="margin-bottom:10px;width:260px;">
                     <div>
                         建筑面积大于：
-                        <el-input size="mini" type="number" v-model="searchForm.builtUpArea" clearable class="input_widthV2">
+                        <el-input size="mini" type="number" v-model="searchForm.builtUpArea" clearable style="width:150px;">
                             <template slot="append">㎡</template>
                         </el-input>
                     </div>
                 </el-col>
             </el-row>
-            <div style="text-align:center;margin-top:10px;">
+            <div style="text-align:center;margin-top:10px;" v-if="sreachBoxFlag">
                 <el-button type="primary" size="mini" @click="sreachData">搜索</el-button>
+                <el-button type="primary" size="mini" @click="resetSreachData">重置</el-button>
             </div>
         </div>
         <el-row type="flex" justify="start">
@@ -152,47 +155,51 @@
             </el-col>
         </el-row>
         <div class="table-box">
-            <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange">
+            <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
                 <el-table-column type="selection" width="55" align='center'></el-table-column>
-                <el-table-column label="项目名称" width="200" align='center'>
+                <el-table-column label="项目名称" width="240" prop="name" align='center' sortable='custom'>
                     <template slot-scope="scope">
-                        <div class="overWord">
+                        <div class="overWord" style="cursor:pointer"  @click="handleClipboard(scope.row.name,$event)">
                             {{scope.row.name}}
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="type" label="类型" width="100" align='center'>
+                <el-table-column prop="type" label="类型" width="100" align='center' sortable='custom'>
                 </el-table-column>
-                <el-table-column label="中标时间" width="100" align='center'>
+                <el-table-column label="中标时间" width="100" align='center' prop="bidding_time" sortable='custom'>
                     <template slot-scope="scope">
                         <el-tag size='mini'>{{scope.row.biddingTime?scope.row.biddingTime:'暂无'}}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="合同时间" width="100" align='center'>
+                <el-table-column label="合同时间" width="100" align='center' prop="contract_time" sortable='custom'>
                     <template slot-scope="scope">
                         <el-tag size='mini'>{{scope.row.contractTime?scope.row.contractTime:'暂无'}}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="初设批复时间" width="100" align='center'>
+                <el-table-column label="初设批复时间" width="120" align='center' prop="first_design_time" sortable='custom'>
                     <template slot-scope="scope">
                         <el-tag size='mini'>{{scope.row.firstDesignTime?scope.row.firstDesignTime:'暂无'}}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="施设批复时间" width="100" align='center'>
+                <el-table-column label="施设批复时间" width="120" align='center' prop="confirm_time" sortable='custom'>
                     <template slot-scope="scope">
                         <el-tag size='mini'>{{scope.row.confirmTime?scope.row.confirmTime:'暂无'}}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="工作内容" width="180" align='center'>
+                <el-table-column label="工作内容" width="220" align='center'>
                     <template slot-scope="scope">
-                        <div class="overWord">
+                        <div class="overWordV2" style="cursor:pointer" @click="handleClipboard(scope.row.designWorkDesc,$event)">
                             {{scope.row.designWorkDesc}}
                         </div>
+                        <el-tag v-if="scope.row.designWorkDesc" class="detail" size="mini" @click.native="showDetail(scope.row.designWorkDesc,'工作内容')">详情</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="项目规模" width="180" align='center'>
+                <el-table-column label="项目规模" width="220" align='center'>
                     <template slot-scope="scope">
-                        {{scope.row.projectScaleDesc}}
+                        <div class="overWordV2" style="cursor:pointer"  @click="handleClipboard(scope.row.projectScaleDesc,$event)">
+                            {{scope.row.projectScaleDesc}}
+                        </div>
+                        <el-tag v-if="scope.row.projectScaleDesc" class="detail" size="mini" @click.native="showDetail(scope.row.projectScaleDesc,'项目规模')">详情</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="文件下载" width="120" align='center'>
@@ -209,7 +216,7 @@
                 </el-table-column>
             </el-table>
             <div class="pagination-box">
-                <el-pagination background layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[10, 15, 20]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+                <el-pagination background layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
                 </el-pagination>
             </div>
         </div>
@@ -284,44 +291,44 @@
                 <el-row>
                     <el-col :span="6">
                         <el-form-item label="项目里程：">
-                            <el-input size="mini" type="number" v-model="form.projectMileage" clearable class="input_widthV2">
-                                <template slot="append">m</template>
+                            <el-input size="mini" type="number" v-model="form.projectMileage" clearable style="width:150px;">
+                                <template slot="append">km</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="6">
+                    <el-col :span="8">
                         <el-form-item label="合同额：">
-                            <el-input size="mini" type="number" v-model="form.contractPrice" clearable class="input_widthV2">
+                            <el-input size="mini" type="number" v-model="form.contractPrice" style="width:180px;">
                                 <template slot="append">万元</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
                     <el-col :span="6">
                         <el-form-item label="最大桥梁长度：">
-                            <el-input size="mini" type="number" v-model="form.bridgeHeight" clearable class="input_widthV2">
+                            <el-input size="mini" type="number" v-model="form.bridgeHeight" clearable style="width:150px;">
                                 <template slot="append">m</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
                 <el-row>
-                    <el-col :span="6">
+                    <el-col :span="8">
                         <el-form-item label="建安费：">
-                            <el-input size="mini" type="number" v-model="form.builtSafeFee" clearable class="input_widthV2">
+                            <el-input size="mini" type="number" v-model="form.builtSafeFee" clearable style="width:180px;">
                                 <template slot="append">万元</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="6">
+                    <el-col :span="7">
                         <el-form-item label="最大隧道长度：">
-                            <el-input size="mini" type="number" v-model="form.tunnelHeight" clearable class="input_widthV2">
+                            <el-input size="mini" type="number" v-model="form.tunnelHeight" clearable style="width:150px;">
                                 <template slot="append">m</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="6">
+                    <el-col :span="7">
                         <el-form-item label="建筑面积：">
-                            <el-input size="mini" type="number" v-model="form.builtUpArea" clearable class="input_widthV2">
+                            <el-input size="mini" type="number" v-model="form.builtUpArea" clearable style="width:150px;">
                                 <template slot="append">㎡</template>
                             </el-input>
                         </el-form-item>
@@ -508,441 +515,551 @@
 
 <script>
 import {
-  getAchievements,
-  addAchievement,
-  removeAchievement,
-  updateAchievement
+    getAchievements,
+    addAchievement,
+    removeAchievement,
+    updateAchievement
 } from "@/api/achievement";
 import editor from "@/components/editor";
 import upload from "@/components/UpLoad";
+import clipboard from "@/utils/clipboard";
 export default {
-  components: {
-    editor,
-    upload
-  },
-  data() {
-    return {
-      uploadData: {
-        uploadFolder: "业绩管理",
-        materialfileList: [],
-        limitFlieNumber: 100,
-        buttonFlag: false
-      },
-      dialogTitle: "新增业绩",
-      orderBy: "create_date desc",
-      multipleSelection: [],
-      tableData: [],
-      loading: false,
-      total: 0,
-      pageIndex: 1,
-      pageSize: 10,
-      currentPage: 1,
-      orderBy: "create_date desc",
-      dialogVisible: false,
-      showVisible: false,
-      searchForm: {
-        name: "",
-        type: "",
-        biddingTime: "",
-        contractTime: "",
-        firstDesignTime: "",
-        confirmTime: "",
-        projectLeader: "",
-        itemLeader: "",
-        surveyEnum: "",
-        designEnum: "",
-        constructionEnum: "",
-        consultingEnum: "",
-        designReplyEnum: "",
-        constructionReplyEnum: "",
-        attenderEnum: "",
-        evaluationEnum: "",
-        oversizeBridgeEnum: "",
-        interchangeEnum: "",
-        safetyFacilitiesEnum: "",
-        mechanicalEnum: "",
-        pipeGalleryEnum: "",
-        specialSoilEnum: "",
-        greeningEnum: "",
-        housingEnum: "",
-        bridgeHeight: "",
-        builtSafeFee: "",
-        builtUpArea: "",
-        contractPrice: "",
-        tunnelHeight: "",
-        projectMileage: ""
-      },
-      form: {
-        name: "",
-        type: "",
-        bridgeHeight: "",
-        builtSafeFee: "",
-        builtUpArea: "",
-        contractPrice: "",
-        tunnelHeight: "",
-        projectMileage: "",
-        biddingTime: "",
-        contractTime: "",
-        firstDesignTime: "",
-        confirmTime: "",
-        projectLeader: "",
-        itemLeader: "",
-        designWorkDesc: "",
-        projectScaleDesc: "",
-        bridgeDesc: "",
-        tunnelDesc: "",
-        otherDesc: "",
-        remark: "",
-        surveyEnum: "",
-        designEnum: "",
-        constructionEnum: "",
-        consultingEnum: "",
-        designReplyEnum: "",
-        constructionReplyEnum: "",
-        attenderEnum: "",
-        evaluationEnum: "",
-        oversizeBridgeEnum: "",
-        interchangeEnum: "",
-        safetyFacilitiesEnum: "",
-        mechanicalEnum: "",
-        pipeGalleryEnum: "",
-        specialSoilEnum: "",
-        greeningEnum: "",
-        housingEnum: ""
-      },
-      rules: {
-        name: [
-          {
-            required: true,
-            message: "请输入姓名",
-            trigger: "blur"
-          }
-        ],
-        type: [
-          {
-            required: true,
-            message: "请选择一个类型",
-            trigger: "change"
-          }
-        ]
-      }
-    };
-  },
-  filters: {},
-  created() {
-    this.loading = true;
-    let data = {
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      orderBy: this.orderBy
-    };
-    getAchievements(data)
-      .then(res => {
-        if (res.success) {
-          this.tableData = res.result.records;
-          this.loading = false;
-          this.total = Number(res.result.total);
-          this.currentPage = res.result.current;
-        }
-      })
-      .catch(err => {
-        this.loading = false;
-      });
-  },
-  methods: {
-    sreachData() {
-      let data = {};
-      data = {
-        pageIndex: 1,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      let searchData = {};
-      for (let val in this.searchForm) {
-        if (this.searchForm[val]) {
-          searchData[val] = this.searchForm[val];
-        }
-      }
-      Object.assign(data, searchData);
-      this.loading = true;
-      getAchievements(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
+    components: {
+        editor,
+        upload
     },
-    handleSizeChange(val) {
-      this.loading = true;
-      let data = {};
-      this.pageSize = val;
-      data = {
-        pageIndex: this.pageIndex,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      let searchData = {};
-      for (let val in this.searchForm) {
-        if (this.searchForm[val]) {
-          searchData[val] = this.searchForm[val];
-        }
-      }
-      Object.assign(data, searchData);
-      getAchievements(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
+    data() {
+        return {
+            sreachBoxFlag: false,
+            uploadData: {
+                uploadFolder: "业绩管理",
+                materialfileList: [],
+                limitFlieNumber: 100,
+                buttonFlag: false
+            },
+            dialogTitle: "新增业绩",
+            orderBy: "create_date desc",
+            multipleSelection: [],
+            tableData: [],
+            loading: false,
+            total: 0,
+            pageIndex: 1,
+            pageSize: 15,
+            currentPage: 1,
+            orderBy: "create_date desc",
+            dialogVisible: false,
+            showVisible: false,
+            searchForm: {
+                name: "",
+                type: "",
+                biddingTime: "",
+                contractTime: "",
+                firstDesignTime: "",
+                confirmTime: "",
+                projectLeader: "",
+                itemLeader: "",
+                surveyEnum: "",
+                designEnum: "",
+                constructionEnum: "",
+                consultingEnum: "",
+                designReplyEnum: "",
+                constructionReplyEnum: "",
+                attenderEnum: "",
+                evaluationEnum: "",
+                oversizeBridgeEnum: "",
+                interchangeEnum: "",
+                safetyFacilitiesEnum: "",
+                mechanicalEnum: "",
+                pipeGalleryEnum: "",
+                specialSoilEnum: "",
+                greeningEnum: "",
+                housingEnum: "",
+                bridgeHeight: "",
+                builtSafeFee: "",
+                builtUpArea: "",
+                contractPrice: "",
+                tunnelHeight: "",
+                projectMileage: ""
+            },
+            form: {
+                name: "",
+                type: "",
+                bridgeHeight: "",
+                builtSafeFee: "",
+                builtUpArea: "",
+                contractPrice: "",
+                tunnelHeight: "",
+                projectMileage: "",
+                biddingTime: "",
+                contractTime: "",
+                firstDesignTime: "",
+                confirmTime: "",
+                projectLeader: "",
+                itemLeader: "",
+                designWorkDesc: "",
+                projectScaleDesc: "",
+                bridgeDesc: "",
+                tunnelDesc: "",
+                otherDesc: "",
+                remark: "",
+                surveyEnum: "",
+                designEnum: "",
+                constructionEnum: "",
+                consultingEnum: "",
+                designReplyEnum: "",
+                constructionReplyEnum: "",
+                attenderEnum: "",
+                evaluationEnum: "",
+                oversizeBridgeEnum: "",
+                interchangeEnum: "",
+                safetyFacilitiesEnum: "",
+                mechanicalEnum: "",
+                pipeGalleryEnum: "",
+                specialSoilEnum: "",
+                greeningEnum: "",
+                housingEnum: ""
+            },
+            rules: {
+                name: [
+                    {
+                        required: true,
+                        message: "请输入姓名",
+                        trigger: "blur"
+                    }
+                ],
+                type: [
+                    {
+                        required: true,
+                        message: "请选择一个类型",
+                        trigger: "change"
+                    }
+                ]
+            }
+        };
     },
-    showAchievement() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个业绩进行查看"
-        });
-        return false;
-      }
-      this.showVisible = true;
+    filters: {},
+    created() {
+        this.loading = true;
+        let data = {
+            pageIndex: this.pageIndex,
+            pageSize: this.pageSize,
+            orderBy: this.orderBy
+        };
+        getAchievements(data)
+            .then(res => {
+                if (res.success) {
+                    this.tableData = res.result.records;
+                    this.loading = false;
+                    this.total = Number(res.result.total);
+                    this.currentPage = res.result.current;
+                }
+            })
+            .catch(err => {
+                this.loading = false;
+            });
     },
-    createdAchievement() {
-      this.dialogTitle = "新增业绩";
-      this.dialogVisible = true;
-    },
-    modifyAchievement() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个业绩进行修改"
-        });
-        return false;
-      }
-      for (let value in this.form) {
-        this.form[value] = this.multipleSelection[0][value]
-          ? this.multipleSelection[0][value]
-          : "";
-      }
-      this.multipleSelection[0].fileRecordList.forEach((value, index) => {
-        this.uploadData.materialfileList.push({
-          name: value.name,
-          url: value.path,
-          response: {
-            result: value.id
-          }
-        });
-      });
-      this.dialogTitle = "修改业绩";
-      this.dialogVisible = true;
-    },
-    deleteAchievement() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个备案进行删除"
-        });
-        return false;
-      }
-      this.$confirm("此操作将永久删除该备案信息, 是否继续?", "提示", {
+    methods: {
+            showDetail(detail,title) {
+      this.$alert(detail, title+"详情", {
         confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          let ids = [];
-          this.multipleSelection.map((value, index) => {
-            ids.push(value.id);
-          });
-          this.loading = true;
-          removeAchievement(ids)
-            .then(res => {
-              if (res.success) {
-                this.$message({
-                  type: "success",
-                  message: "删除成功!"
+        callback: action => {}
+      });
+    },
+        handleClipboard(text, event) {
+            clipboard(text, event);
+        },
+        tableSort(row) {
+            let sortData = "";
+            if (row.order == "descending") {
+                sortData = row.prop + " desc";
+            } else {
+                sortData = row.prop;
+            }
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize,
+                orderBy: sortData
+            };
+            let searchData = {};
+            for (let val in this.searchForm) {
+                if (this.searchForm[val]) {
+                    searchData[val] = this.searchForm[val];
+                }
+            }
+            Object.assign(data, searchData);
+            this.loading = true;
+            getAchievements(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
                 });
-                this.loading = true;
-                let data = {};
-                this.searchText = "";
-                data = {
-                  pageIndex: this.pageIndex,
-                  pageSize: this.pageSize,
-                  orderBy: this.orderBy
-                };
-                let searchData = {};
-                for (let val in this.searchForm) {
-                  this.searchForm[val] = "";
+        },
+        resetSreachData() {
+            for (let val in this.searchForm) {
+                this.searchForm[val] = "";
+            }
+        },
+        sreachData() {
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            let searchData = {};
+            for (let val in this.searchForm) {
+                if (this.searchForm[val]) {
+                    searchData[val] = this.searchForm[val];
                 }
-                getAchievements(data)
-                  .then(res => {
+            }
+            Object.assign(data, searchData);
+            this.loading = true;
+            getAchievements(data)
+                .then(res => {
                     if (res.success) {
-                      this.tableData = res.result.records;
-                      this.loading = false;
-                      this.total = Number(res.result.total);
-                      this.currentPage = res.result.current;
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+
+                        this.currentPage = res.result.current;
                     }
-                  })
-                  .catch(err => {
+                })
+                .catch(err => {
                     this.loading = false;
-                  });
-              }
-            })
-            .catch(() => {
-              this.loading = false;
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    handleCurrentChange(val) {},
-    submitInfo(formName) {
-      let dealFun = function() {};
-      let submitData = {};
-      let files = [];
-      this.uploadData.materialfileList.forEach((value, index) => {
-        files.push({ id: value.response.result });
-      });
-      this.form["fileRecordList"] = files;
-      this.form.otherDesc = this.$refs.otherDesc.content;
-      this.form.itemLeader = this.$refs.itemLeader.content;
-      if (this.dialogTitle == "新增业绩") {
-        dealFun = addAchievement;
-        submitData = this.form;
-      } else {
-        dealFun = updateAchievement;
-        for (let val in this.multipleSelection[0]) {
-          if (this.form[val] !== undefined) {
-            this.multipleSelection[0][val] = this.form[val];
-          }
-        }
-        submitData = this.multipleSelection[0];
-      }
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.uploadData.buttonFlag = true;
-          dealFun(submitData)
-            .then(res => {
-              if (res.success) {
-                this.uploadData.buttonFlag = false;
-                this.dialogVisible = false;
-                this.loading = true;
-                this.searchText = "";
-                let data = {
-                  pageIndex: this.pageIndex,
-                  pageSize: this.pageSize,
-                  orderBy: this.orderBy
-                };
-                for (let val in this.searchForm) {
-                  this.searchForm[val] = "";
+                });
+        },
+        handleSizeChange(val) {
+            this.loading = true;
+            let data = {};
+            this.pageSize = val;
+            data = {
+                pageIndex: this.pageIndex,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            let searchData = {};
+            for (let val in this.searchForm) {
+                if (this.searchForm[val]) {
+                    searchData[val] = this.searchForm[val];
                 }
-                getAchievements(data)
-                  .then(res => {
+            }
+            Object.assign(data, searchData);
+            getAchievements(data)
+                .then(res => {
                     if (res.success) {
-                      this.tableData = res.result.records;
-                      this.loading = false;
-                      this.total = Number(res.result.total);
-                      this.currentPage = res.result.current;
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
                     }
-                  })
-                  .catch(err => {
+                })
+                .catch(err => {
                     this.loading = false;
-                  });
-              }
-            })
-            .catch(() => {
-              this.uploadData.buttonFlag = false;
+                });
+        },
+        showAchievement() {
+            if (this.multipleSelection.length != 1) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个业绩进行查看"
+                });
+                return false;
+            }
+            this.showVisible = true;
+        },
+        createdAchievement() {
+            this.dialogTitle = "新增业绩";
+            this.dialogVisible = true;
+        },
+        modifyAchievement() {
+            if (this.multipleSelection.length !== 1) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个业绩进行修改"
+                });
+                return false;
+            }
+            for (let value in this.form) {
+                this.form[value] = this.multipleSelection[0][value]
+                    ? this.multipleSelection[0][value]
+                    : "";
+            }
+            this.multipleSelection[0].fileRecordList.forEach((value, index) => {
+                this.uploadData.materialfileList.push({
+                    name: value.name,
+                    url: value.path,
+                    response: {
+                        result: value.id
+                    }
+                });
             });
-        } else {
-          console.log("error submit!!");
-          return false;
+            console.log(this.multipleSelection[0]);
+            // this.$refs.otherDesc.content = this.form.otherDesc;
+            // this.$refs.itemLeader.content = this.form.itemLeader;
+            console.log(this.form.itemLeader);
+            console.log(this.form.otherDesc);
+            this.dialogTitle = "修改业绩";
+            this.dialogVisible = true;
+        },
+        deleteAchievement() {
+            if (this.multipleSelection.length == 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择至少一个备案进行删除"
+                });
+                return false;
+            }
+            this.$confirm("此操作将永久删除该备案信息, 是否继续?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+            })
+                .then(() => {
+                    let ids = [];
+                    this.multipleSelection.map((value, index) => {
+                        ids.push(value.id);
+                    });
+                    this.loading = true;
+                    removeAchievement(ids)
+                        .then(res => {
+                            if (res.success) {
+                                this.$message({
+                                    type: "success",
+                                    message: "删除成功!"
+                                });
+                                this.loading = true;
+                                let data = {};
+                                this.searchText = "";
+                                data = {
+                                    pageIndex: this.pageIndex,
+                                    pageSize: this.pageSize,
+                                    orderBy: this.orderBy
+                                };
+                                let searchData = {};
+                                for (let val in this.searchForm) {
+                                    this.searchForm[val] = "";
+                                }
+                                getAchievements(data)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            this.loading = false;
+                        });
+                })
+                .catch(() => {
+                    this.$message({
+                        type: "info",
+                        message: "已取消删除"
+                    });
+                });
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        handleCurrentChange(val) {
+            this.loading = true;
+            let data = {};
+            this.pageIndex = val;
+            data = {
+                pageIndex: this.pageIndex,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            let searchData = {};
+            for (let val in this.searchForm) {
+                if (this.searchForm[val]) {
+                    searchData[val] = this.searchForm[val];
+                }
+            }
+            Object.assign(data, searchData);
+            getAchievements(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        },
+        submitInfo(formName) {
+            let dealFun = function() {};
+            let submitData = {};
+            let files = [];
+            this.uploadData.materialfileList.forEach((value, index) => {
+                files.push({ id: value.response.result });
+            });
+            this.form["fileRecordList"] = files;
+            this.form.otherDesc = this.$refs.otherDesc.content;
+            this.form.itemLeader = this.$refs.itemLeader.content;
+            if (this.dialogTitle == "新增业绩") {
+                dealFun = addAchievement;
+                submitData = this.form;
+            } else {
+                dealFun = updateAchievement;
+                for (let val in this.multipleSelection[0]) {
+                    if (this.form[val] !== undefined) {
+                        this.multipleSelection[0][val] = this.form[val];
+                    }
+                }
+                submitData = this.multipleSelection[0];
+            }
+            this.$refs[formName].validate(valid => {
+                if (valid) {
+                    this.uploadData.buttonFlag = true;
+                    dealFun(submitData)
+                        .then(res => {
+                            if (res.success) {
+                                this.uploadData.buttonFlag = false;
+                                this.dialogVisible = false;
+                                this.loading = true;
+                                this.searchText = "";
+                                let data = {
+                                    pageIndex: this.pageIndex,
+                                    pageSize: this.pageSize,
+                                    orderBy: this.orderBy
+                                };
+                                for (let val in this.searchForm) {
+                                    this.searchForm[val] = "";
+                                }
+                                getAchievements(data)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            this.uploadData.buttonFlag = false;
+                        });
+                } else {
+                    console.log("error submit!!");
+                    return false;
+                }
+            });
+        },
+        cancelSubmit(formName) {
+            this.dialogVisible = false;
+        },
+        closeDialog() {
+            this.$refs["form"].resetFields();
+            for (let value in this.form) {
+                this.form[value] = "";
+            }
+            this.$refs.itemLeader.content = "";
+            this.$refs.otherDesc.content = "";
+            this.uploadData.materialfileList = [];
         }
-      });
-    },
-    cancelSubmit(formName) {
-      this.dialogVisible = false;
-    },
-    closeDialog() {
-      this.$refs["form"].resetFields();
-      for (let value in this.form) {
-        this.form[value] = "";
-      }
-      this.$refs.itemLeader.content = "";
-      this.$refs.otherDesc.content = "";
-      this.uploadData.materialfileList = [];
     }
-  }
 };
 </script>
 <style lang="scss" scoped>
 .table-box {
-  margin-top: 10px;
-  max-width: 1336px;
+    margin-top: 10px;
+    max-width: 1576px;
 }
 .input_width {
-  width: 200px;
+    width: 200px;
 }
 .input_widthV2 {
-  width: 120px;
+    width: 120px;
 }
 .dialog-title {
-  border-left-width: 4px;
-  border-left-color: deepskyblue;
-  border-left-style: solid;
-  padding-left: 10px;
-  margin-bottom: 20px;
-}
-.pagination-box {
-  margin: 10px auto;
-  text-align: center;
-}
-.overWord {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.content {
-  margin-bottom: 10px;
-}
-.searchBox {
-  margin: 10px 0;
-  //   background-color: burlywood;
-  border: 1px #eee solid;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 13px;
-  color: #808183;
-  &_margin {
-    margin-left: 5px;
-  }
-  &-item {
-    margin: 10px 0;
-    margin-left: 5px;
-  }
-  &-title {
     border-left-width: 4px;
     border-left-color: deepskyblue;
     border-left-style: solid;
     padding-left: 10px;
-  }
+    margin-bottom: 20px;
+}
+.pagination-box {
+    margin: 10px auto;
+    text-align: center;
+}
+.overWord {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.content {
+    margin-bottom: 10px;
+}
+.searchBox {
+    position: relative;
+    margin: 10px 0;
+    //   background-color: burlywood;
+    border: 1px #eee solid;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 13px;
+    color: #808183;
+    &_margin {
+        margin-left: 5px;
+    }
+    &-item {
+        margin: 10px 0;
+        margin-left: 5px;
+    }
+    &-title {
+        border-left-width: 4px;
+        border-left-color: deepskyblue;
+        border-left-style: solid;
+        padding-left: 10px;
+    }
+}
+.search_down {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+}
+.overWordV2{
+      overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 50px;
+}
+.detail {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(-20%, 40%);
+  cursor: pointer;
 }
 </style>
 

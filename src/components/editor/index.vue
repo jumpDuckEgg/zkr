@@ -34,28 +34,33 @@ export default {
     components: {
         quillEditor
     },
-    props:{
-        toolbarName:{
-            type:String,
-            default:'toolbar'
+    props: {
+        toolbarName: {
+            type: String,
+            default: "toolbar"
         },
-        parentsContent:{
-            type:String,
-            default:''
+        parentsContent: {
+            type: String,
+            default: ""
         }
     },
     data() {
         return {
-            content:'',
+            content: "",
             editorOption: {
                 modules: {
-                    toolbar: '#'+this.toolbarName
+                    toolbar: "#" + this.toolbarName
                 }
             }
         };
     },
-    created(){
-        this.content=this.parentsContent
+    created() {
+        this.content = this.parentsContent;
+    },
+    watch: {
+        parentsContent: function(val) {
+            this.content = val;
+        }
     },
     methods: {
         onEditorBlur(editor) {

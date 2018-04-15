@@ -45,7 +45,7 @@
         </el-table-column>
       </el-table>
       <div class="pagination-box">
-        <el-pagination background layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[10, 15, 20]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+        <el-pagination background layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
         </el-pagination>
       </div>
 
@@ -135,7 +135,7 @@ export default {
       loading: false,
       pageIndex: 1,
       total: 1,
-      pageSize: 10,
+      pageSize: 15,
       currentPage: 1,
       searchText: "",
       select: "",

@@ -29,16 +29,12 @@
                 </el-table-column>
                 <el-table-column label="系统链接" width="80" align="center">
                     <template slot-scope="scope">
-                        <el-tooltip class="item" effect="dark" :content="scope.row.systemLink" placement="bottom">
                             <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.systemLink)">转跳</el-button>
-                        </el-tooltip>
                     </template>
                 </el-table-column>
                 <el-table-column label="登入入口" width="80" align="center">
                     <template slot-scope="scope">
-                        <el-tooltip class="item" effect="dark" :content="scope.row.loginLink" placement="bottom">
                             <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.loginLink)">转跳</el-button>
-                        </el-tooltip>
                     </template>
                 </el-table-column>
                 <el-table-column prop="account" label="账号" width="100" align="center">
@@ -76,9 +72,7 @@
                 </el-table-column>
                 <el-table-column label="办事指南" width="80" align="center">
                     <template slot-scope="scope">
-                        <el-tooltip class="item" effect="dark" :content="scope.row.guide" placement="bottom">
                             <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.guide)">转跳</el-button>
-                        </el-tooltip>
                     </template>
                 </el-table-column>
                 <el-table-column label="系统数据描述" width="270" align="center">
@@ -97,7 +91,7 @@
                 </el-table-column>
             </el-table>
             <div class="pagination-box">
-                <el-pagination background="" layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[ 10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+                <el-pagination background layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
                 </el-pagination>
             </div>
         </div>

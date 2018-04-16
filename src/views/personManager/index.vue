@@ -25,63 +25,63 @@
     </el-row>
     <div class="table-box">
       <el-table v-loading="loading" :data="tableData" size='mini' border @selection-change="handleSelectionChange" :row-class-name="tableRowClassName" @sort-change='tableSort'>
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="name" label="姓名" width="90" align='center' sortable='custom'>
+        <el-table-column type="selection" width="40" align="center"></el-table-column>
+        <el-table-column prop="name" label="姓名" width="80" align='center' sortable='custom'>
           <template slot-scope="scope">
             <div class="overWord hand" @click="handleClipboard(scope.row.name,$event)">
               {{scope.row.name}}
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="idCardNo" label="身份证号" width="150" align='center'>
+        <el-table-column prop="idCardNo" label="身份证号" width="145" align='center'>
           <template slot-scope="scope">
             <div class="overWord hand" @click="handleClipboard(scope.row.idCardNo,$event)">
               {{scope.row.idCardNo}}
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="id_validity_date" label="身份证有效期" width="130" align='center' sortable='custom'>
+        <el-table-column prop="id_validity_date" label="身份证有效期" width="120" align='center' sortable='custom'>
           <template slot-scope="scope">
             {{scope.row.idValidityDate}}
           </template>
         </el-table-column>
-        <el-table-column label="毕业信息" width="150" align='center'>
+        <el-table-column label="毕业信息" width="145" align='center'>
           <template slot-scope="scope">
             <div class="overWord hand" @click="handleClipboard(scope.row.graduationInfo,$event)">
               {{scope.row.graduationInfo}}
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="diploma" label="学历" width="80" align='center' sortable='custom'>
+        <el-table-column prop="diploma" label="学历" width="70" align='center' sortable='custom'>
         </el-table-column>
-        <el-table-column prop="degree" label="学位" width="80" align='center' sortable='custom'>
+        <el-table-column prop="degree" label="学位" width="70" align='center' sortable='custom'>
         </el-table-column>
-        <el-table-column prop="title" label="职称" width="100" align='center'>
+        <el-table-column prop="title" label="职称" width="90" align='center'>
           <template slot-scope="scope">
             <div class="overWord hand" @click="handleClipboard(scope.row.title,$event)">
               {{scope.row.title}}
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="grade" label="等级" width="80" align='center' sortable='custom'>
+        <el-table-column prop="grade" label="等级" width="70" align='center' sortable='custom'>
         </el-table-column>
-        <el-table-column prop="type" label="类型" width="80" align='center'>
+        <el-table-column prop="type" label="类型" width="70" align='center'>
         </el-table-column>
-        <el-table-column prop="qualification" label="执业资格" width="80" align='center'>
+        <el-table-column prop="qualification" label="执业资格" width="70" align='center'>
           <template slot-scope="scope">
             <div class="overWord hand" @click="handleClipboard(scope.row.qualification,$event)">
               {{scope.row.qualification}}
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="注册有效期" prop="validity_period" width="130" align='center' sortable='custom'>
+        <el-table-column label="注册有效期" prop="validity_period" width="110" align='center' sortable='custom'>
           <template slot-scope="scope">
             {{scope.row.validityPeriod}}
           </template>
         </el-table-column>
         <el-table-column prop="currentPosition" label="当前职位" width="100" align='center'>
         </el-table-column>
-        <el-table-column prop="social_security" label="社保所在地" width="110" align='center' sortable='custom'>
+        <el-table-column prop="social_security" label="社保所在地" width="105" align='center' sortable='custom'>
           <template slot-scope="scope">
             {{scope.row.socialSecurity}}
           </template>
@@ -93,7 +93,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="获奖情况" width="150" align='center'>
+        <el-table-column label="获奖情况" width="130" align='center'>
           <template slot-scope="scope">
             <div class="overWord">
               {{scope.row.winnings}}
@@ -764,7 +764,7 @@ export default {
 <style lang="scss" scoped>
 .table-box {
   margin-top: 10px;
-  // width: 776px;
+  max-width: 1677px;
 }
 .input_width {
   width: 200px;

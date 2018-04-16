@@ -224,7 +224,7 @@
         <el-button size="mini" type="danger" @click="cancelSubmit('form')" v-loading='submitFlag'>取 消</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="showPersonVisible" width="800px" center>
+    <el-dialog :visible.sync="showPersonVisible" width="800px" >
       <div class="dialog-title">用户详情</div>
       <el-row class="userInfo-title">
         <el-col :span="4"><img :src="user" alt="userImage" class="userImage"></el-col>

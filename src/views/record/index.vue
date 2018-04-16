@@ -16,11 +16,11 @@
             </el-col>
         </el-row>
         <div class="table-box">
-            <el-table v-loading="loading" :data="tableData"  size='mini' border @selection-change="handleSelectionChange" :row-class-name="tableRowClassName" @sort-change='tableSort'>
+            <el-table v-loading="loading" :data="tableData" size='mini' border @selection-change="handleSelectionChange" :row-class-name="tableRowClassName" @sort-change='tableSort'>
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="region" label="地区" width="80" align="center" sortable='custom'>
                 </el-table-column>
-                <el-table-column prop="system_name" label="系统名称" width="120" align="center" sortable='custom'>
+                <el-table-column prop="system_name" label="系统名称" width="150" align="center" sortable='custom'>
                     <template slot-scope="scope">
                         <div class="overWord">
                             {{scope.row.systemName}}
@@ -62,7 +62,7 @@
                 </el-table-column>
                 <el-table-column prop="tel" label="电话" width="120" align="center">
                 </el-table-column>
-                <el-table-column label="地址" width="150" align="center">
+                <el-table-column label="地址" width="200" align="center">
                     <template slot-scope="scope">
                         <div class="overWord">
                             {{scope.row.address}}
@@ -81,7 +81,7 @@
                         </el-tooltip>
                     </template>
                 </el-table-column>
-                <el-table-column label="系统数据描述" width="150" align="center">
+                <el-table-column label="系统数据描述" width="270" align="center">
                     <template slot-scope="scope">
                         <div class="overWord">
                             {{scope.row.desc}}
@@ -197,7 +197,7 @@
         </el-dialog>
 
         <!-- 预览 -->
-        <el-dialog :visible.sync="showRecordVisible" width="800px" center>
+        <el-dialog :visible.sync="showRecordVisible" width="800px">
             <div class="dialog-title">备案详情</div>
             <div>
                 <img :src="recordImage" alt="recordImage" class="recordImage">
@@ -317,450 +317,463 @@
 
 <script>
 import {
-  createRecord,
-  updateRecord,
-  getRecords,
-  deleteRecord
+    createRecord,
+    updateRecord,
+    getRecords,
+    deleteRecord
 } from "@/api/record";
 import upload from "@/components/UpLoad";
 import citys from "./city";
 import recordImage from "@/assets/record/isalter.png";
 export default {
-  components: {
-    upload
-  },
-  data() {
-    return {
-      uploadData: {
-        uploadFolder: "备案管理",
-        materialfileList: [],
-        limitFlieNumber: 100,
-        buttonFlag: false
-      },
-      recordImage,
-      showRecordVisible: false,
-      dialogTitle: "新增备案",
-      searchText: "",
-      select: "",
-      cityArray: citys,
-      multipleSelection: [],
-      tableData: [],
-      loading: false,
-      total: 0,
-      pageIndex: 1,
-      pageSize: 15,
-      currentPage: 1,
-      orderBy: "create_date desc",
-      dialogVisible: false,
-      form: {
-        region: "",
-        systemName: "",
-        systemLink: "",
-        loginLink: "",
-        account: "",
-        password: "",
-        validityDate: "",
-        tel: "",
-        address: "",
-        guide: "",
-        desc: "",
-        remark: ""
-      },
-      rules: {
-        region: [
-          {
-            required: true,
-            message: "请选择地区",
-            trigger: "change"
-          }
-        ],
-        systemName: [
-          {
-            required: true,
-            message: "请输入系统名称",
-            trigger: "blur"
-          }
-        ],
-        validity: [
-          {
-            required: true,
-            message: "请选择有效期",
-            trigger: "change"
-          }
-        ]
-      }
-    };
-  },
-  filters: {},
-  created() {
-    this.loading = true;
-    let data = {
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      orderBy: this.orderBy
-    };
-    getRecords(data)
-      .then(res => {
-        if (res.success) {
-          this.tableData = res.result.records;
-          this.loading = false;
-          this.total = Number(res.result.total);
-          this.currentPage = res.result.current;
-        }
-      })
-      .catch(err => {
-        this.loading = false;
-      });
-  },
-  methods: {
-    tableRowClassName({ row, rowIndex }) {
-      let idValidity = row.validityDate
-        ? row.validityDate.split("-")
-        : "1996-10-30".split("-");
-      let nowDay = new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        new Date().getDate()
-      );
-      let idValidityDate = new Date(
-        idValidity[0],
-        idValidity[1] - 1,
-        idValidity[2]
-      );
-      let limitTime = 1000 * 60 * 60 * 24 * 60; //两个月
-      if (idValidityDate.getTime() < nowDay.getTime()) {
-        return "danger-row";
-      }
-      if (idValidityDate.getTime() - nowDay.getTime() < limitTime) {
-          console.log("warning-row")
-        return "warning-row";
-      }
-      return "";
+    components: {
+        upload
     },
-    tableSort(row) {
-      let sortData = "";
-      if (row.order == "descending") {
-        sortData = row.prop + " desc";
-      } else {
-        sortData = row.prop;
-      }
-      let data = {};
-      data = {
-        pageIndex: 1,
-        pageSize: this.pageSize,
-        orderBy: sortData
-      };
-      this.loading = true;
-      getRecords(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    sreachData() {
-      let data = {};
-      data = {
-        pageIndex: 1,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      data["systemName"] = this.searchText;
-      getRecords(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    turnUrl(url) {
-      window.open("http://" + url);
-    },
-    closeDialog() {
-      this.$refs["form"].resetFields();
-      for (let value in this.form) {
-        this.form[value] = "";
-      }
-      this.uploadData.materialfileList = [];
-    },
-    submitRecord(formName) {
-      let dealFun = function() {};
-      let submitData = {};
-      let files = [];
-      this.uploadData.materialfileList.forEach((value, index) => {
-        files.push({ id: value.response.result });
-      });
-      this.form["fileRecordList"] = files;
-      if (this.dialogTitle == "新增备案") {
-        dealFun = createRecord;
-
-        submitData = this.form;
-      } else {
-        dealFun = updateRecord;
-        for (let val in this.multipleSelection[0]) {
-          if (this.form[val] !== undefined) {
-            this.multipleSelection[0][val] = this.form[val];
-          }
-        }
-        submitData = this.multipleSelection[0];
-      }
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.uploadData.buttonFlag = true;
-          dealFun(submitData)
-            .then(res => {
-              if (res.success) {
-                this.uploadData.buttonFlag = false;
-                this.dialogVisible = false;
-                this.loading = true;
-                this.searchText = "";
-                let data = {
-                  pageIndex: this.pageIndex,
-                  pageSize: this.pageSize,
-                  orderBy: this.orderBy
-                };
-                getRecords(data)
-                  .then(res => {
-                    if (res.success) {
-                      this.tableData = res.result.records;
-                      this.loading = false;
-                      this.total = Number(res.result.total);
-                      this.currentPage = res.result.current;
+    data() {
+        return {
+            uploadData: {
+                uploadFolder: "备案管理",
+                materialfileList: [],
+                limitFlieNumber: 100,
+                buttonFlag: false
+            },
+            recordImage,
+            showRecordVisible: false,
+            dialogTitle: "新增备案",
+            searchText: "",
+            select: "",
+            cityArray: citys,
+            multipleSelection: [],
+            tableData: [],
+            loading: false,
+            total: 0,
+            pageIndex: 1,
+            pageSize: 15,
+            currentPage: 1,
+            orderBy: "create_date desc",
+            dialogVisible: false,
+            form: {
+                region: "",
+                systemName: "",
+                systemLink: "",
+                loginLink: "",
+                account: "",
+                password: "",
+                validityDate: "",
+                tel: "",
+                address: "",
+                guide: "",
+                desc: "",
+                remark: ""
+            },
+            rules: {
+                region: [
+                    {
+                        required: true,
+                        message: "请选择地区",
+                        trigger: "change"
                     }
-                  })
-                  .catch(err => {
-                    this.loading = false;
-                  });
-              }
-            })
-            .catch(() => {
-              this.uploadData.buttonFlag = false;
-            });
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+                ],
+                systemName: [
+                    {
+                        required: true,
+                        message: "请输入系统名称",
+                        trigger: "blur"
+                    }
+                ],
+                validity: [
+                    {
+                        required: true,
+                        message: "请选择有效期",
+                        trigger: "change"
+                    }
+                ]
+            }
+        };
     },
-    cancelSubmit(formName) {
-      this.dialogVisible = false;
-    },
-    createdRecord() {
-      this.dialogTitle = "新增备案";
-      this.dialogVisible = true;
-    },
-    modifyRecord() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个备案进行修改"
-        });
-        return false;
-      }
-      for (let value in this.form) {
-        this.form[value] = this.multipleSelection[0][value]
-          ? this.multipleSelection[0][value]
-          : "";
-      }
-      this.multipleSelection[0].fileRecordList.forEach((value, index) => {
-        this.uploadData.materialfileList.push({
-          name: value.name,
-          url: value.path,
-          response: {
-            result: value.id
-          }
-        });
-      });
-
-      this.dialogTitle = "修改备案";
-      this.dialogVisible = true;
-    },
-    showRecord() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个备案进行预览"
-        });
-        return false;
-      }
-      this.showRecordVisible = true;
-    },
-    deleteRecord() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个备案进行删除"
-        });
-        return false;
-      }
-      this.$confirm("此操作将永久删除该备案信息, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          let ids = [];
-          this.multipleSelection.map((value, index) => {
-            ids.push(value.id);
-          });
-          this.loading = true;
-          deleteRecord(ids)
+    filters: {},
+    created() {
+        this.loading = true;
+        let data = {
+            pageIndex: this.pageIndex,
+            pageSize: this.pageSize,
+            orderBy: this.orderBy
+        };
+        getRecords(data)
             .then(res => {
-              if (res.success) {
-                this.$message({
-                  type: "success",
-                  message: "删除成功!"
+                if (res.success) {
+                    this.tableData = res.result.records;
+                    this.loading = false;
+                    this.total = Number(res.result.total);
+                    this.currentPage = res.result.current;
+                }
+            })
+            .catch(err => {
+                this.loading = false;
+            });
+    },
+    methods: {
+        tableRowClassName({ row, rowIndex }) {
+            let idValidity = row.validityDate
+                ? row.validityDate.split("-")
+                : "1996-10-30".split("-");
+            let nowDay = new Date(
+                new Date().getFullYear(),
+                new Date().getMonth(),
+                new Date().getDate()
+            );
+            let idValidityDate = new Date(
+                idValidity[0],
+                idValidity[1] - 1,
+                idValidity[2]
+            );
+            let limitTime = 1000 * 60 * 60 * 24 * 60; //两个月
+            if (idValidityDate.getTime() < nowDay.getTime()) {
+                return "danger-row";
+            }
+            if (idValidityDate.getTime() - nowDay.getTime() < limitTime) {
+                console.log("warning-row");
+                return "warning-row";
+            }
+            return "";
+        },
+        tableSort(row) {
+            let sortData = "";
+            if (row.order == "descending") {
+                sortData = row.prop + " desc";
+            } else {
+                sortData = row.prop;
+            }
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize,
+                orderBy: sortData
+            };
+            this.loading = true;
+            getRecords(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
                 });
-                this.loading = true;
-                let data = {};
-                this.searchText = "";
-                data = {
-                  pageIndex: this.pageIndex,
-                  pageSize: this.pageSize,
-                  orderBy: this.orderBy
-                };
-                getRecords(data)
-                  .then(res => {
+        },
+        sreachData() {
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            data["systemName"] = this.searchText;
+            getRecords(data)
+                .then(res => {
                     if (res.success) {
-                      this.tableData = res.result.records;
-                      this.loading = false;
-                      this.total = Number(res.result.total);
-                      this.currentPage = res.result.current;
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
                     }
-                  })
-                  .catch(err => {
+                })
+                .catch(err => {
                     this.loading = false;
-                  });
-              }
-            })
-            .catch(() => {
-              this.loading = false;
+                });
+        },
+        turnUrl(url) {
+            if (url) {
+                window.open("http://" + url);
+            } else {
+                this.$message({
+                    type: "warning",
+                    message: "暂无链接"
+                });
+            }
+        },
+        closeDialog() {
+            this.$refs["form"].resetFields();
+            for (let value in this.form) {
+                this.form[value] = "";
+            }
+            this.uploadData.materialfileList = [];
+        },
+        submitRecord(formName) {
+            let dealFun = function() {};
+            let submitData = {};
+            let files = [];
+            this.uploadData.materialfileList.forEach((value, index) => {
+                files.push({ id: value.response.result });
             });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    handleSizeChange(val) {
-      this.loading = true;
-      let data = {};
-      this.pageSize = val;
-      data = {
-        pageIndex: this.pageIndex,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      if (this.searchText) {
-        data["systemName"] = this.searchText;
-      }
-      getRecords(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    handleCurrentChange(val) {
-      this.loading = true;
-      let data = {};
-      this.pageIndex = val;
-      data = {
-        pageIndex: this.pageIndex,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      if (this.searchText) {
-        data["systemName"] = this.searchText;
-      }
-      getRecords(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
+            this.form["fileRecordList"] = files;
+            if (this.dialogTitle == "新增备案") {
+                dealFun = createRecord;
+
+                submitData = this.form;
+            } else {
+                dealFun = updateRecord;
+                for (let val in this.multipleSelection[0]) {
+                    if (this.form[val] !== undefined) {
+                        this.multipleSelection[0][val] = this.form[val];
+                    }
+                }
+                submitData = this.multipleSelection[0];
+            }
+            this.$refs[formName].validate(valid => {
+                if (valid) {
+                    this.uploadData.buttonFlag = true;
+                    dealFun(submitData)
+                        .then(res => {
+                            if (res.success) {
+                                this.uploadData.buttonFlag = false;
+                                this.dialogVisible = false;
+                                this.loading = true;
+                                this.searchText = "";
+                                let data = {
+                                    pageIndex: this.pageIndex,
+                                    pageSize: this.pageSize,
+                                    orderBy: this.orderBy
+                                };
+                                getRecords(data)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            this.uploadData.buttonFlag = false;
+                        });
+                } else {
+                    console.log("error submit!!");
+                    return false;
+                }
+            });
+        },
+        cancelSubmit(formName) {
+            this.dialogVisible = false;
+        },
+        createdRecord() {
+            this.dialogTitle = "新增备案";
+            this.dialogVisible = true;
+        },
+        modifyRecord() {
+            if (this.multipleSelection.length == 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择至少一个备案进行修改"
+                });
+                return false;
+            }
+            for (let value in this.form) {
+                this.form[value] = this.multipleSelection[0][value]
+                    ? this.multipleSelection[0][value]
+                    : "";
+            }
+            this.multipleSelection[0].fileRecordList.forEach((value, index) => {
+                this.uploadData.materialfileList.push({
+                    name: value.name,
+                    url: value.path,
+                    response: {
+                        result: value.id
+                    }
+                });
+            });
+
+            this.dialogTitle = "修改备案";
+            this.dialogVisible = true;
+        },
+        showRecord() {
+            if (this.multipleSelection.length == 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择至少一个备案进行预览"
+                });
+                return false;
+            }
+            this.showRecordVisible = true;
+        },
+        deleteRecord() {
+            if (this.multipleSelection.length == 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择至少一个备案进行删除"
+                });
+                return false;
+            }
+            this.$confirm("此操作将永久删除该备案信息, 是否继续?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+            })
+                .then(() => {
+                    let ids = [];
+                    this.multipleSelection.map((value, index) => {
+                        ids.push(value.id);
+                    });
+                    this.loading = true;
+                    deleteRecord(ids)
+                        .then(res => {
+                            if (res.success) {
+                                this.$message({
+                                    type: "success",
+                                    message: "删除成功!"
+                                });
+                                this.loading = true;
+                                let data = {};
+                                this.searchText = "";
+                                data = {
+                                    pageIndex: this.pageIndex,
+                                    pageSize: this.pageSize,
+                                    orderBy: this.orderBy
+                                };
+                                getRecords(data)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            this.loading = false;
+                        });
+                })
+                .catch(() => {
+                    this.$message({
+                        type: "info",
+                        message: "已取消删除"
+                    });
+                });
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        handleSizeChange(val) {
+            this.loading = true;
+            let data = {};
+            this.pageSize = val;
+            data = {
+                pageIndex: this.pageIndex,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            if (this.searchText) {
+                data["systemName"] = this.searchText;
+            }
+            getRecords(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        },
+        handleCurrentChange(val) {
+            this.loading = true;
+            let data = {};
+            this.pageIndex = val;
+            data = {
+                pageIndex: this.pageIndex,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            if (this.searchText) {
+                data["systemName"] = this.searchText;
+            }
+            getRecords(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        }
     }
-  }
 };
 </script>
 <style lang="scss" scoped>
 .table-box {
-  margin-top: 10px;
-  max-width: 1466px;
+    margin-top: 10px;
+    max-width: 1666px;
 }
 .input_width {
-  width: 600px;
+    width: 600px;
 }
 .dialog-title {
-  border-left-width: 4px;
-  border-left-color: deepskyblue;
-  border-left-style: solid;
-  padding-left: 10px;
-  margin-bottom: 20px;
+    border-left-width: 4px;
+    border-left-color: deepskyblue;
+    border-left-style: solid;
+    padding-left: 10px;
+    margin-bottom: 20px;
 }
 .pagination-box {
-  margin: 20px auto;
-  text-align: center;
+    margin: 20px auto;
+    text-align: center;
 }
 .overWord {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .InfoCenter {
-  // background-color: deepskyblue;
-  // width: 100%;
-  // padding: 20px;
-  // color: white;
-  // border-radius: 10px;
+    // background-color: deepskyblue;
+    // width: 100%;
+    // padding: 20px;
+    // color: white;
+    // border-radius: 10px;
 }
 .content {
-  margin-bottom: 10px;
-  margin-left: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
 }
 .recordImage {
-  width: 110px;
-  height: 85px;
-  position: absolute;
-  top: 50px;
-  right: 40px;
+    width: 110px;
+    height: 85px;
+    position: absolute;
+    top: 50px;
+    right: 40px;
 }
 .svg-icon {
-  margin-right: 6px;
+    margin-right: 6px;
 }
 .fileItem {
-  display: inline-block;
-  margin: 0 10px;
+    display: inline-block;
+    margin: 0 10px;
 }
 </style>
 

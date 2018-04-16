@@ -1,67 +1,57 @@
 <template>
     <div class="app-container">
-        <el-row type="flex" justify="end">
-            <el-col style="width:400px;margin-bottom:10px;">
-                <el-input placeholder="请输入内容" v-model="searchText" class="input-with-select" size='mini'>
-                    <el-select v-model="select" slot="prepend" placeholder="请选择" style="width:90px;">
-                        <el-option label="姓名" value="1"></el-option>
-                        <el-option label="身份证号" value="2"></el-option>
-                    </el-select>
-                    <el-button slot="append" icon="el-icon-search"></el-button>
-                </el-input>
-            </el-col>
-        </el-row>
-        <el-row type="flex" justify="start">
-            <el-col>
-                <el-button size="mini" type="primary" plain @click="dialogVisible=true">新增人员</el-button>
-                <el-button size="mini" type="success" plain>修改人员</el-button>
-                <el-button size="mini" type="info" plain>删除人员</el-button>
-                <el-button size="mini" type="danger" plain>预览</el-button>
-            </el-col>
-        </el-row>
-        <div class="table-box">
-            <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="55"></el-table-column>
-                <el-table-column prop="userName" label="姓名" width="180">
-                </el-table-column>
-                <el-table-column prop="type" label="类型" width="180">
-                </el-table-column>
-                <el-table-column label="创建时间" width="180">
-                    <template slot-scope="scope">
-                        <el-tag size='mini'>{{scope.row.createDate}}</el-tag>
-                    </template>
-                </el-table-column>
-                <el-table-column label="备注" width="180">
-                    <template slot-scope="scope">
-                        <div class="overWord">
-                            {{scope.row.remark}}
-                        </div>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <div class="pagination-box">
-                <el-pagination small layout="prev, pager, next" :total="total" :page-size="pageSize" @current-change="handleCurrentChange">
-                </el-pagination>
-            </div>
-        </div>
+
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane label="跟踪中的项目" name="跟踪中的项目">
+                <el-row type="flex" justify="start">
+                    <el-col>
+                        <el-button size="mini" type="primary" plain @click="dialogVisible =true">新增项目</el-button>
+                        <el-button size="mini" type="success" plain>修改项目</el-button>
+                        <el-button size="mini" type="info" plain>删除项目</el-button>
+                        <el-button size="mini" type="danger" plain>预览</el-button>
+                    </el-col>
+                </el-row>
+                <normaltable :loading='trackLoading' :tableMaxWidth='trackTableMaxWidth' :columns='trackColumns' :tableData='trackTableData' @multipleSelection='trackMultipleSelection' @sort='trackTableSort'></normaltable>
+            </el-tab-pane>
+            <el-tab-pane label="确定报名的项目" name="确定报名的项目">确定报名的项目</el-tab-pane>
+            <el-tab-pane label="确定不报名的项目" name="确定不报名的项目">确定不报名的项目</el-tab-pane>
+            <el-tab-pane label="已投标的项目中标" name="已投标的项目中标">已投标的项目(中标)</el-tab-pane>
+            <el-tab-pane label="已投标的项目未中标" name="已投标的项目未中标">已投标的项目(未中标)</el-tab-pane>
+            <el-tab-pane label="弃标的项目" name="弃标的项目">弃标的项目</el-tab-pane>
+        </el-tabs>
         <!-- 新增用户 -->
-        <el-dialog :visible.sync="dialogVisible" width="350px" center lock-scroll>
+        <el-dialog :visible.sync="dialogVisible" width="900px" center lock-scroll>
             <div class="dialog-title">新增用户</div>
             <el-form ref="form" :model="form" :rules="rules" label-width="70px">
-                <el-form-item label="姓名：" prop="name">
+                <el-form-item label="项目名称：" prop="name">
                     <el-input size="mini" v-model="form.name" clearable class="input_width"></el-input>
                 </el-form-item>
-                <el-form-item label="类型：" prop="type">
-                    <el-select size="mini" v-model="form.type" placeholder="请选择" class="input_width">
-                        <el-option label="普通用户" value="普通用户"></el-option>
-                        <el-option label="超级管理员" value="超级管理员"></el-option>
-                        <el-option label="管理员" value="管理员"></el-option>
+                <el-form-item label="权重：" prop="weightEnum">
+                    <el-select size="mini" v-model="form.weightEnum" placeholder="请选择" class="input_width">
+                        <el-option label="低" value="低"></el-option>
+                        <el-option label="较低" value="较低"></el-option>
+                        <el-option label="一般" value="一般"></el-option>
+                        <el-option label="较高" value="较高"></el-option>
+                        <el-option label="高" value="高"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="密码：" prop="password">
-                    <el-input size="mini" v-model="form.password" class="input_width" type="password" ref="password">
-                        <i class="el-icon-view el-input__icon" slot="suffix"></i>
-                    </el-input>
+                <el-form-item label="编号：" prop="biddingNo">
+                    <el-input size="mini" v-model="form.biddingNo" clearable class="input_width"></el-input>
+                </el-form-item>
+                <el-form-item label="公告链接：" prop="announcementLink">
+                    <el-input size="mini" v-model="form.announcementLink" clearable class="input_width"></el-input>
+                </el-form-item>
+                <el-form-item label="公告时间：" prop="announcementTime">
+                    <el-input size="mini" v-model="form.announcementTime" clearable class="input_width"></el-input>
+                </el-form-item>
+                <el-form-item label="预计得分：" prop="expectedScore">
+                    <el-input size="mini" type="number" v-model="form.expectedScore" clearable class="input_width"></el-input>
+                </el-form-item>
+                <el-form-item label="报名要求：" prop="reqistrationRequire">
+                    <el-input size="mini" type="textarea" v-model="form.reqistrationRequire" clearable class="input_width"></el-input>
+                </el-form-item>
+                <el-form-item label="公告联系方式：" prop="announcementContactInfo ">
+                    <el-input size="mini" type="textarea" v-model="form.announcementContactInfo" clearable class="input_width"></el-input>
                 </el-form-item>
                 <el-form-item label="备注：" prop="remark">
                     <el-input size="mini" type="textarea" v-model="form.remark" clearable class="input_width"></el-input>
@@ -76,18 +66,122 @@
 </template>
 
 <script>
-import { getPersonManagers } from "@/api/personManager";
-
+import normaltable from "@/components/NormalTable";
+import upload from "@/components/UpLoad";
 export default {
+    components: {
+        normaltable,
+        upload
+    },
     data() {
         return {
-            searchText: "",
-            select: "",
-            multipleSelection: [],
-            tableData: [],
-            loading: false,
-            total: 0,
-            pageSize: 5,
+            uploadData: {
+                uploadFolder: "投标管理",
+                materialfileList: [],
+                limitFlieNumber: 100,
+                buttonFlag: false
+            },
+            activeName: "跟踪中的项目",
+            trackTableMaxWidth: "1251px",
+            trackLoading: false,
+            trackColumns: [
+                {
+                    width: 180,
+                    prop: "name",
+                    text: "项目名称",
+                    field: "name",
+                    sort: "custom",
+                    type: "text"
+                },
+                {
+                    width: 120,
+                    prop: "bidding_no",
+                    text: "编号",
+                    field: "biddingNo",
+                    sort: "custom",
+                    type: "text"
+                },
+                {
+                    width: 80,
+                    prop: "announcement_link",
+                    text: "公告链接",
+                    field: "announcementLink",
+                    sort: false,
+                    type: "button"
+                },
+                {
+                    width: 100,
+                    prop: "announcement_time",
+                    text: "公告时间",
+                    field: "announcementTime",
+                    sort: "custom",
+                    type: "text"
+                },
+                {
+                    width: 95,
+                    prop: "expected_score",
+                    text: "预计得分",
+                    field: "expectedScore",
+                    sort: "custom",
+                    type: "text"
+                },
+                {
+                    width: 160,
+                    prop: "reqistration_require",
+                    text: "报名要求",
+                    field: "reqistrationRequire",
+                    sort: false,
+                    type: "text"
+                },
+                {
+                    width: 50,
+                    prop: "weight_enum",
+                    text: "权重",
+                    field: "weightEnum",
+                    sort: false,
+                    type: "text"
+                },
+                {
+                    width: 80,
+                    prop: "file_record_list",
+                    text: "文件上传",
+                    field: "fileRecordList",
+                    sort: false,
+                    type: "file"
+                },
+                {
+                    width: 160,
+                    prop: "announcementContactInfo",
+                    text: "公告联系方式",
+                    field: "announcementContactInfo",
+                    sort: false,
+                    type: "text"
+                },
+                {
+                    width: 180,
+                    prop: "remark",
+                    text: "备注",
+                    field: "remark",
+                    sort: false,
+                    type: "text"
+                }
+            ],
+            trackTableData: [
+                {
+                    name: "aaa",
+                    biddingNo: "00061516161",
+                    announcementLink: "www.baidu.com",
+                    announcementTime: "2018-10-10",
+                    expectedScore: "80",
+                    reqistrationRequire:
+                        "必须具备一定的条件才可以必须具备一定的条件才可以",
+                    weightEnum: "高",
+                    fileRecordList: [],
+                    announcementContactInfo:
+                        "请上官网联系客服人员进行办理相关手续",
+                    remark: "啊实打实大苏打实打实"
+                }
+            ],
             dialogVisible: false,
             form: {
                 name: "",
@@ -99,28 +193,21 @@ export default {
                 name: [
                     {
                         required: true,
-                        message: "请输入姓名",
+                        message: "请输入项目名称",
                         trigger: "blur"
                     }
                 ],
-                type: [
+                weightEnum: [
                     {
                         required: true,
-                        message: "请选择一个用户类型",
+                        message: "请选择权重类型",
                         trigger: "change"
                     }
                 ],
-                password: [
+                biddingNo: [
                     {
                         required: true,
-                        message: "请输入密码",
-                        trigger: "blur"
-                    }
-                ],
-                remark: [
-                    {
-                        required: true,
-                        message: "请填写备注",
+                        message: "请输入编号",
                         trigger: "blur"
                     }
                 ]
@@ -130,10 +217,15 @@ export default {
     filters: {},
     created() {},
     methods: {
-        handleSelectionChange(val) {
-            this.multipleSelection = val;
+        handleClick(tab, event) {
+            console.log(tab.name);
         },
-        handleCurrentChange(val) {}
+        trackMultipleSelection(val) {
+            console.log(val);
+        },
+        trackTableSort(val) {
+            console.log(val);
+        }
     }
 };
 </script>

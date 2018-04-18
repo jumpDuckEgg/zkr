@@ -1,8 +1,8 @@
 <template>
     <div>
-        <el-table v-loading='loading' :data="data" border :row-style="showTr" stripe size='mini' border @selection-change="handleSelectionChange">
+        <el-table v-loading='loading' :data="data" border :row-style="showTr" stripe size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
             <el-table-column type="selection" align="center" width="45"></el-table-column>
-            <el-table-column :label="column.text" v-for="(column,index) in columns" :key="index" :width="column.width?column.width:''" align="center" show-overflow-tooltip>
+            <el-table-column :label="column.text" v-for="(column,index) in columns" :key="index" :prop="column.prop" :sortable='column.sort' :width="column.width?column.width:''" align="center" show-overflow-tooltip>
                 <template slot-scope="props">
                     <span v-if="spaceIconShow(index)" v-for="(space, levelIndex) in props.row._level" :key='levelIndex' class="ms-tree-space"></span>
                     <template v-if="toggleIconShow(index,props.row)">
@@ -132,7 +132,17 @@ export default {
     },
     handleSelectionChange(val) {
       this.$emit("multipleSelection", val);
-    }
+    },
+    tableSort(row) {
+      let sortData = "";
+      if (row.order == "descending") {
+        sortData = row.prop + " desc";
+      } else {
+        sortData = row.prop;
+      }
+      // console.log(sortData)
+      this.$emit("sort", sortData);
+    },
   }
 };
 </script>

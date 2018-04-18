@@ -21,62 +21,8 @@
             </el-col>
         </el-row>
         <div class="table-box">
-            <tree-grid :columns="columns" :loading='loading' :tree-structure="true" :data-source="tableData" style="margin-top:10px;" @multipleSelection='handleSelectionChange'></tree-grid>
+            <tree-grid :columns="columns" :loading='loading' :tree-structure="true" :data-source="tableData" style="margin-top:10px;" @sort='tableSort' @multipleSelection='handleSelectionChange'></tree-grid>
 
-            <!-- <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="35" align="center"></el-table-column>
-                <el-table-column prop="type" label="类型" width="80" align="center">
-                    <template slot-scope="scope">
-                        <template v-if="scope.row.childFlag==1&&scope.row.parentId == 0">
-                            <i v-if="!scope.row.show" class="el-icon-arrow-right" aria-hidden="true" @click="toggle(scope.row.id)"></i>
-                            <i v-if="scope.row.show" class="el-icon-arrow-down" aria-hidden="true" @click="toggle(scope.row.id)"></i>
-                        </template>
-                        {{scope.row.type}}
-                    </template>
-                </el-table-column>
-                <el-table-column prop="contractNo" label="合同编号" width="180" align="center">
-                </el-table-column>
-                <el-table-column prop="name" label="合同名称" width="180" align="center" show-overflow-tooltip>
-                </el-table-column>
-                <el-table-column prop="originName" label="对方单位" width="180" align="center" show-overflow-tooltip>
-                </el-table-column>
-                <el-table-column prop="signType" label="院签/自签" width="80" align="center">
-                </el-table-column>
-                <el-table-column prop="price" label="合同额" width="180" align="center">
-                </el-table-column>
-                <el-table-column prop="payment" label="已支付金额" width="180" align="center">
-                </el-table-column>
-                <el-table-column prop="content" label="工作内容" width="180" show-overflow-tooltip align="center">
-                </el-table-column>
-                <el-table-column prop="progress" label="工程进度" width="180" show-overflow-tooltip align="center">
-                </el-table-column>
-                <el-table-column prop="priceDesc" label="金额说明（勘察设计费）" width="180" show-overflow-tooltip align="center">
-                    <template slot-scope="scope">
-                        <span v-html="scope.row.priceDesc"></span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="paymentTerms" label="支付条款" width="180" show-overflow-tooltip align="center">
-                    <template slot-scope="scope">
-                        <span v-html="scope.row.paymentTerms"></span>
-                    </template>
-                </el-table-column>
-                <el-table-column prop="paymentItems" label="支付明细" width="180" show-overflow-tooltip align="center">
-                    <template slot-scope="scope">
-                        <span v-html="scope.row.paymentItems"></span>
-                    </template>
-                </el-table-column>
-                <el-table-column label="文件下载" width="120" align='center'>
-                    <template slot-scope="scope">
-                        <el-button size="mini">详情</el-button>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="备注" width="180" show-overflow-tooltip align="center">
-                    <template slot-scope="scope">
-                        {{scope.row.remark}}
-                    </template>
-                </el-table-column>
-            </el-table> -->
             <div class="pagination-box">
                 <el-pagination small layout="prev, pager,next,sizes,total" :total="total" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
                 </el-pagination>
@@ -332,85 +278,106 @@ export default {
           text: "类型",
           field: "type",
           width: "120",
-          type: "text"
+          type: "text",
+          prop: "type",
+          sort: false
         },
         {
           text: "合同编号",
           field: "contractNo",
           width: "180",
-          type: "text"
+          type: "text",
+          prop: "contract_no",
+          sort: "custom"
         },
         {
           text: "合同名称",
           field: "name",
           width: "180",
-          type: "text"
+          type: "text",
+          prop: "name",
+          sort: "custom"
         },
         {
           text: "对方单位",
           field: "originName",
           width: "180",
-          type: "text"
+          type: "text",
+          prop: "origin_name",
+          sort: "custom"
         },
         {
           text: "院签/自签",
           field: "signType",
           width: "80",
-          type: "text"
+          type: "text",
+          prop: "sign_type",
+          sort: "custom"
         },
         {
           text: "合同额",
           field: "price",
           width: "180",
-          type: "text"
+          type: "text",
+          prop: "price",
+          sort: "custom"
         },
         {
           text: "已支付金额",
           field: "payment",
           width: "180",
-          type: "text"
+          type: "text",
+          prop: "payment",
+          sort: "custom"
         },
         {
           text: "工作内容",
           field: "content",
           width: "180",
-          type: "text"
+          type: "text",
+          sort: false
         },
         {
           text: "工程进度",
           field: "progress",
           width: "180",
-          type: "text"
+          type: "text",
+          sort: false
         },
         {
           text: "金额说明（勘察设计费）",
           field: "priceDesc",
           width: "180",
-          type: "text"
+          type: "text",
+          sort: false
         },
         {
           text: "支付条款",
           field: "paymentTerms",
           width: "180",
-          type: "text"
+          type: "text",
+          sort: false
         },
         {
           text: "支付明细",
           field: "paymentItems",
           width: "180",
-          type: "text"
+          type: "text",
+          sort: false
         },
         {
           text: "文件下载",
           field: "paymentItems",
           width: "120",
-          type: "file"
+          type: "file",
+          sort: false
         },
         {
           text: "备注",
           field: "remark",
           width: "180",
-          type: "text"
+          type: "text",
+          sort: false
         }
       ],
       form: {
@@ -469,6 +436,29 @@ export default {
       });
   },
   methods: {
+    tableSort(sortData) {
+      let data = {};
+      data = {
+        pageIndex: 1,
+        pageSize: this.pageSize,
+        orderBy: sortData,
+        parentId:this.parentId
+      };
+      this.loading = true;
+      getContracts(data)
+        .then(res => {
+          if (res.success) {
+            this.tableData = res.result.records;
+            this.loading = false;
+            this.total = Number(res.result.total);
+
+            this.currentPage = res.result.current;
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+        });
+    },
     submitContract(formName) {
       let dealFun = function() {};
       let submitData = {};
@@ -493,8 +483,8 @@ export default {
         submitData.parentId = this.tempParentId;
       } else {
         dealFun = updateContract;
-        this.multipleSelection[0]._parent={};
-        this.multipleSelection[0].children=null;
+        this.multipleSelection[0]._parent = {};
+        this.multipleSelection[0].children = null;
         for (let val in this.multipleSelection[0]) {
           if (this.form[val] !== undefined) {
             this.multipleSelection[0][val] = this.form[val];
@@ -503,7 +493,7 @@ export default {
         submitData = this.multipleSelection[0];
       }
       console.log(submitData);
-    // return false;
+      // return false;
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.uploadData.buttonFlag = true;
@@ -673,7 +663,7 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(val)
+      console.log(val);
     },
     handleCurrentChange(val) {
       this.loading = true;

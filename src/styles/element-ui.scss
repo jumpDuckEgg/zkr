@@ -53,4 +53,6 @@
 .el-input-group>.el-input__inner{
   display: inline;
 }
-
+.el-tooltip__popper{
+  max-width: 240px;
+}

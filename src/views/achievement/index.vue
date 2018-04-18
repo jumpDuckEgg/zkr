@@ -186,26 +186,16 @@
                         <el-tag size='mini'>{{scope.row.confirmTime?scope.row.confirmTime:'暂无'}}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="工作内容" width="220" align='center'>
+                <el-table-column label="工作内容" width="220" align='center' show-overflow-tooltip>
                     <template slot-scope="scope">
-                        <div class="overWordV2" style="cursor:pointer" @click="handleClipboard(scope.row.designWorkDesc,$event)">
+                        <span style="cursor:pointer" @click="handleClipboard(scope.row.designWorkDesc,$event)">
                             {{scope.row.designWorkDesc}}
-                        </div>
-                        <el-tooltip v-if="scope.row.designWorkDesc" class="item" effect="dark"   placement="bottom">
-                            <div slot="content" style="max-width:240px">{{scope.row.designWorkDesc}}</div>
-                            <el-tag v-if="scope.row.designWorkDesc" class="detail" size="mini">详情</el-tag>
-                        </el-tooltip>
+                        </span>
                     </template>
                 </el-table-column>
-                <el-table-column label="项目规模" width="220" align='center'>
+                <el-table-column label="项目规模" width="220" align='center' show-overflow-tooltip>
                     <template slot-scope="scope">
-                        <div class="overWordV2" style="cursor:pointer" @click="handleClipboard(scope.row.projectScaleDesc,$event)">
-                            {{scope.row.projectScaleDesc}}
-                        </div>
-                        <el-tooltip v-if="scope.row.projectScaleDesc" class="item" effect="dark"   placement="bottom">
-                            <div slot="content" style="max-width:240px">{{scope.row.projectScaleDesc}}</div>
-                            <el-tag class="detail" size="mini">详情</el-tag>
-                        </el-tooltip>
+                        <span style="cursor:pointer" @click="handleClipboard(scope.row.projectScaleDesc,$event)">{{scope.row.projectScaleDesc}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="文件下载" width="120" align='center'>
@@ -401,7 +391,7 @@
             </span>
         </el-dialog>
         <!-- 预览 -->
-        <el-dialog :visible.sync="showVisible" width="1000px">
+        <el-dialog :visible.sync="showVisible" width="1000px" top='3vh'>
             <div class="dialog-title">业绩详情</div>
             <div class="content">
                 <svg-icon icon-class='process'></svg-icon>
@@ -1017,6 +1007,10 @@ export default {
 }
 .content {
   margin-bottom: 10px;
+  margin-left: 10px;
+  border: #eeeeee 1px solid;
+  padding: 10px;
+  border-radius: 5px;
 }
 .searchBox {
   position: relative;

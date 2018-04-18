@@ -754,6 +754,7 @@ export default {
 .content {
     margin-bottom: 10px;
     margin-left: 10px;
+    
 }
 .recordImage {
     width: 110px;

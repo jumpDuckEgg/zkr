@@ -1,30 +1,49 @@
 <template>
-    <div>
-        <div class="table-box" :style="'max-width:'+tableMaxWidth">
-            <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
-                <el-table-column type="selection" align="center" width="45"></el-table-column>
-                <el-table-column align="center" :label="column.text" :prop="column.prop" v-for="(column,index) in columns" :key="index" :width="column.width" :sortable='column.sort'>
-                    <template slot-scope="scope">
-                        <div class="overWord" v-if="column.type=='text'">
-                            {{ scope.row[column.field] }}
-                        </div>
-                        <template v-if="column.type=='button'">
-                            <template v-if="!scope.row[column.field]">
-                                <el-tag size="mini" type="danger">暂无链接</el-tag>
-                            </template>
-                            <el-button v-if="scope.row[column.field]" type="danger" plain size="mini" @click="turnUrl(scope.row[column.field])">转跳</el-button>
-                        </template>
-                        <template v-if="column.type=='file'">
-                            <el-button type="danger" plain size="mini">查看</el-button>
-                        </template>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </div>
+  <div>
+    <div class="table-box" :style="'max-width:'+tableMaxWidth">
+      <el-table v-loading="loading" :data="tableData" stripe size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
+        <el-table-column type="selection" align="center" width="45"></el-table-column>
+        <el-table-column :align="column.textStyle" header-align='center' show-overflow-tooltip :label="column.text" :prop="column.prop" v-for="(column,index) in columns" :key="index" :width="column.width" :sortable='column.sort'>
+          <template slot-scope="scope">
+            <template v-if="column.type=='text'">
+              <template v-if="scope.row.weightEnum&&(scope.row.weightEnum=='较高'||scope.row.weightEnum=='高')&&column.text=='项目名称'">
+                <el-tag type="danger" size="mini">F</el-tag>
+              </template>
+              <template v-if="checkDate(scope.row.createDate)&&column.text=='项目名称'">
+                <el-tag size="mini">N</el-tag>
+              </template>
+              <template v-if="scope.row.type=='主标'&&column.text=='项目名称'&&tableType=='确定报名的项目'">
+                <el-tag size="mini">主</el-tag>
+              </template>
+              <template v-if="scope.row.type=='陪标'&&column.text=='项目名称'&&tableType=='确定报名的项目'">
+                <el-tag size="mini">陪</el-tag>
+              </template>
+              <span style="cursor:pointer" @click="handleClipboard(scope.row[column.field],$event)">
+                {{ scope.row[column.field] }}
+              </span>
+            </template>
+            <template v-if="column.type=='button'">
+              <template v-if="!scope.row[column.field]">
+                <el-tag size="mini" type="danger">暂无链接</el-tag>
+              </template>
+              <el-button v-if="scope.row[column.field]" type="danger" plain size="mini" @click="turnUrl(scope.row[column.field])">转跳</el-button>
+            </template>
+            <template v-if="column.type=='file'">
+              <el-button type="danger" plain size="mini">查看</el-button>
+            </template>
+            <template v-if="column.type=='enroll'">
+              <el-button type="text" size="mini" @click="enroll(scope.row,'yes')">报名</el-button>
+              <el-button type="text" size="mini" @click="enroll(scope.row,'no')">不报名</el-button>
+            </template>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
+  </div>
 </template>
 
 <script>
+import clipboard from "@/utils/clipboard";
 export default {
   name: "normal-table",
   props: {
@@ -60,6 +79,9 @@ export default {
   },
   created() {},
   methods: {
+    handleClipboard(text, event) {
+      clipboard(text, event);
+    },
     turnUrl(url) {
       if (url) {
         window.open("http://" + url);
@@ -82,8 +104,22 @@ export default {
       }
       // console.log(sortData)
       this.$emit("sort", sortData);
+    },
+    checkDate: function(value) {
+      let startDate = new Date(value);
+      let nowDate = new Date();
+      let limitTime = 1000 * 60 * 60 * 24 * 3;
+      if (nowDate.getTime() - startDate.getTime() < 1000 * 60 * 60 * 24 * 3) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    enroll(data, status) {
+      this.$emit("enroll", data, status);
     }
-  }
+  },
+  filters: {}
 };
 </script>
 <style lang="scss" scoped>
@@ -92,9 +128,9 @@ export default {
   max-width: 1666px;
 }
 .overWord {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  // overflow: hidden;
+  // text-overflow: ellipsis;
+  // white-space: nowrap;
 }
 </style>
 

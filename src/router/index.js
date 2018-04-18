@@ -145,6 +145,18 @@ export const constantRouterMap = [
       }
     ]
   },
+  {
+    path: '/file',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'file',
+        component: () => import('@/views/file/index'),
+        meta: { title: '文件管理', icon: 'feiji' }
+      }
+    ]
+  },
   { path: '*', redirect: '/404', hidden: true }
 ]
 

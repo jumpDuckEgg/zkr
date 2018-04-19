@@ -29,7 +29,7 @@
                         </el-table-column>
                         <el-table-column label="文件查看" width="120" align="center">
                             <template slot-scope="scope">
-                                <el-button type="danger" size="mini">查看</el-button>
+                                <el-button type="danger" size="mini" @click="showFileList(scope.row.fileRecordList)">查看</el-button>
                             </template>
                         </el-table-column>
                         <el-table-column label="备注" width="180" align="center" show-overflow-tooltip>
@@ -137,699 +137,698 @@
                 </template>
             </div>
         </el-dialog>
+        <el-dialog :visible.sync="showFileVisible" width="800px" @close='closeFileDialog'>
+            <div class="dialog-title">文件详情</div>
+            <files :fileList='fileListData' :clearFlag.sync='clearFlag'></files>
+        </el-dialog>
     </div>
 </template>
 
 <script>
 import {
-    getFileCommon,
-    addFileCommon,
-    updateFileCommon,
-    removeFileCommon
+  getFileCommon,
+  addFileCommon,
+  updateFileCommon,
+  removeFileCommon
 } from "@/api/fileCommon";
 import { getSQLFile, addSQLFile, resetSQLFile, deleteFile } from "@/api/file";
 import upload from "@/components/UpLoad";
+import files from "@/components/FileList";
 export default {
-    components: {
-        upload
+  components: {
+    upload,
+    files
+  },
+  data() {
+    return {
+      clearFlag: false,
+      showFileVisible: false,
+      fileListData: [],
+      rolesFlag: true,
+      sqlData: {
+        loading: false,
+        tableData: [],
+        multipleSelection: [],
+        total: 0,
+        pageIndex: 1,
+        pageSize: 15,
+        currentPage: 1,
+        orderBy: "create_date desc"
+      },
+      activeName: "其他文件管理",
+      uploadData: {
+        uploadFolder: "公共文件",
+        materialfileList: [],
+        limitFlieNumber: 100,
+        buttonFlag: false
+      },
+      showVisible: false,
+      dialogTitle: "新增文件",
+      searchText: "",
+      multipleSelection: [],
+      tableData: [],
+      loading: false,
+      total: 0,
+      pageIndex: 1,
+      pageSize: 15,
+      currentPage: 1,
+      orderBy: "create_date desc",
+      dialogVisible: false,
+      form: {
+        fileTypeName: "",
+        resume: "",
+        remark: ""
+      },
+      rules: {
+        fileTypeName: [
+          {
+            required: true,
+            message: "请输入文件类型",
+            trigger: "blur"
+          }
+        ]
+      }
+    };
+  },
+  filters: {},
+  created() {
+    let roles = this.$store.state.user.roles;
+    if (roles == "管理员") {
+      this.rolesFlag = false;
+    }
+    this.loading = true;
+    let data = {
+      pageIndex: this.pageIndex,
+      pageSize: this.pageSize,
+      orderBy: this.orderBy
+    };
+    getFileCommon(data)
+      .then(res => {
+        if (res.success) {
+          this.tableData = res.result.records;
+          this.loading = false;
+          this.total = Number(res.result.total);
+          this.currentPage = res.result.current;
+        }
+      })
+      .catch(err => {
+        this.loading = false;
+      });
+  },
+  methods: {
+      closeFileDialog(){
+          this.clearFlag = true;
+      },
+    showFileList(data) {
+      this.fileListData = data;
+      this.showFileVisible = true;
     },
-    data() {
-        return {
-            rolesFlag:true,
-            sqlData: {
-                loading: false,
-                tableData: [],
-                multipleSelection: [],
-                total: 0,
-                pageIndex: 1,
-                pageSize: 15,
-                currentPage: 1,
-                orderBy: "create_date desc"
-            },
-            activeName: "其他文件管理",
-            uploadData: {
-                uploadFolder: "公共文件",
-                materialfileList: [],
-                limitFlieNumber: 100,
-                buttonFlag: false
-            },
-            showVisible: false,
-            dialogTitle: "新增文件",
-            searchText: "",
-            multipleSelection: [],
-            tableData: [],
-            loading: false,
-            total: 0,
-            pageIndex: 1,
-            pageSize: 15,
-            currentPage: 1,
-            orderBy: "create_date desc",
-            dialogVisible: false,
-            form: {
-                fileTypeName: "",
-                resume: "",
-                remark: ""
-            },
-            rules: {
-                fileTypeName: [
-                    {
-                        required: true,
-                        message: "请输入文件类型",
-                        trigger: "blur"
+    turnUrl(url) {
+      if (url) {
+        window.open("http://" + url);
+      } else {
+        this.$message({
+          type: "warning",
+          message: "暂无链接"
+        });
+      }
+    },
+    createSqlFile() {
+      addSQLFile()
+        .then(res => {
+          if (res.success) {
+            this.$message({
+              type: "success",
+              message: "数据备份成功"
+            });
+            this.sqlData.loading = true;
+            let data = {
+              pageIndex: this.sqlData.pageIndex,
+              pageSize: this.sqlData.pageSize,
+              orderBy: this.sqlData.orderBy,
+              type: "数据库管理"
+            };
+            getSQLFile(data)
+              .then(res => {
+                if (res.success) {
+                  this.sqlData.tableData = res.result.records;
+                  this.sqlData.loading = false;
+                  this.sqlData.total = Number(res.result.total);
+                  this.sqlData.currentPage = res.result.current;
+                }
+              })
+              .catch(err => {
+                this.sqlData.loading = false;
+              });
+          } else {
+            this.sqlData.loading = false;
+          }
+        })
+        .catch(err => {
+          this.sqlData.loading = false;
+        });
+    },
+    restoreSqlFile() {
+      if (this.sqlData.multipleSelection.length != 1) {
+        this.$message({
+          type: "warning",
+          message: "请选择一个文件进行还原"
+        });
+        return false;
+      }
+      this.$confirm("此操作将还原数据库信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let id = "";
+          id = this.sqlData.multipleSelection[0].id;
+          this.sqlData.loading = true;
+
+          resetSQLFile({ id: id })
+            .then(res => {
+              if (res.success) {
+                this.$message({
+                  type: "success",
+                  message: "数据库还原成功!"
+                });
+                this.sqlData.loading = true;
+                let data = {};
+                data = {
+                  pageIndex: this.sqlData.pageIndex,
+                  pageSize: this.sqlData.pageSize,
+                  orderBy: this.sqlData.orderBy,
+                  type: "数据库管理"
+                };
+                getSQLFile(data)
+                  .then(res => {
+                    if (res.success) {
+                      this.sqlData.tableData = res.result.records;
+                      this.sqlData.loading = false;
+                      this.sqlData.total = Number(res.result.total);
+                      this.sqlData.currentPage = res.result.current;
                     }
-                ]
-            }
-        };
+                  })
+                  .catch(err => {
+                    this.sqlData.loading = false;
+                  });
+              }
+            })
+            .catch(() => {
+              this.sqlData.loading = false;
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
-    filters: {},
-    created() {
-         let roles = this.$store.state.user.roles;
-        if(roles == '管理员'){
-            this.rolesFlag= false;
+    deleteSqlFile() {
+      if (this.sqlData.multipleSelection.length == 0) {
+        this.$message({
+          type: "warning",
+          message: "请选择至少一个文件进行删除"
+        });
+        return false;
+      }
+      this.$confirm("此操作将删除数据库信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let ids = [];
+          this.sqlData.multipleSelection.map((value, index) => {
+            ids.push(value.id);
+          });
+          this.sqlData.loading = true;
+
+          deleteFile(ids)
+            .then(res => {
+              if (res.success) {
+                this.$message({
+                  type: "success",
+                  message: "数据库备份删除成功!"
+                });
+                this.sqlData.loading = true;
+                let data = {};
+                data = {
+                  pageIndex: this.sqlData.pageIndex,
+                  pageSize: this.sqlData.pageSize,
+                  orderBy: this.sqlData.orderBy,
+                  type: "数据库管理"
+                };
+                getSQLFile(data)
+                  .then(res => {
+                    if (res.success) {
+                      this.sqlData.tableData = res.result.records;
+                      this.sqlData.loading = false;
+                      this.sqlData.total = Number(res.result.total);
+                      this.sqlData.currentPage = res.result.current;
+                    }
+                  })
+                  .catch(err => {
+                    this.sqlData.loading = false;
+                  });
+              }
+            })
+            .catch(() => {
+              this.sqlData.loading = false;
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
+    sreachData() {
+      let data = {};
+      data = {
+        pageIndex: 1,
+        pageSize: this.pageSize,
+        orderBy: this.orderBy
+      };
+      data["fileTypeName"] = this.searchText;
+      getFileCommon(data)
+        .then(res => {
+          if (res.success) {
+            this.tableData = res.result.records;
+            this.loading = false;
+            this.total = Number(res.result.total);
+            this.currentPage = res.result.current;
+          }
+        })
+        .catch(err => {
+          this.loading = false;
+        });
+    },
+    submitFile(formName) {
+      let dealFun = function() {};
+      let submitData = {};
+      let files = [];
+      this.uploadData.materialfileList.forEach((value, index) => {
+        files.push({ id: value.response.result });
+      });
+      this.form["fileRecordList"] = files;
+      if (this.dialogTitle == "新增文件") {
+        dealFun = addFileCommon;
+
+        submitData = this.form;
+      } else {
+        dealFun = updateFileCommon;
+        for (let val in this.multipleSelection[0]) {
+          if (this.form[val] !== undefined) {
+            this.multipleSelection[0][val] = this.form[val];
+          }
+        }
+        submitData = this.multipleSelection[0];
+      }
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.uploadData.buttonFlag = true;
+          dealFun(submitData)
+            .then(res => {
+              if (res.success) {
+                this.uploadData.buttonFlag = false;
+                this.dialogVisible = false;
+                this.loading = true;
+                this.searchText = "";
+                let data = {
+                  pageIndex: this.pageIndex,
+                  pageSize: this.pageSize,
+                  orderBy: this.orderBy
+                };
+                getFileCommon(data)
+                  .then(res => {
+                    if (res.success) {
+                      this.tableData = res.result.records;
+                      this.loading = false;
+                      this.total = Number(res.result.total);
+                      this.currentPage = res.result.current;
+                    }
+                  })
+                  .catch(err => {
+                    this.loading = false;
+                  });
+              }
+            })
+            .catch(() => {
+              this.uploadData.buttonFlag = false;
+            });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    cancelSubmit(formName) {
+      this.dialogVisible = false;
+    },
+    closeDialog() {
+      this.$refs["form"].resetFields();
+      for (let value in this.form) {
+        this.form[value] = "";
+      }
+      this.uploadData.materialfileList = [];
+    },
+    createFile() {
+      this.dialogTitle = "新增文件";
+      this.dialogVisible = true;
+    },
+    modifyFile() {
+      if (this.multipleSelection.length == 0) {
+        this.$message({
+          type: "warning",
+          message: "请选择一个文件进行修改"
+        });
+        return false;
+      }
+      for (let value in this.form) {
+        this.form[value] = this.multipleSelection[0][value]
+          ? this.multipleSelection[0][value]
+          : "";
+      }
+      this.multipleSelection[0].fileRecordList.forEach((value, index) => {
+        this.uploadData.materialfileList.push({
+          name: value.name,
+          url: value.path,
+          response: {
+            result: value.id
+          }
+        });
+      });
+
+      this.dialogTitle = "修改文件";
+      this.dialogVisible = true;
+    },
+    removeFile() {
+      if (this.multipleSelection.length == 0) {
+        this.$message({
+          type: "warning",
+          message: "请选择至少一个文件进行删除"
+        });
+        return false;
+      }
+      this.$confirm("此操作将永久删除该文件信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          let ids = [];
+          this.multipleSelection.map((value, index) => {
+            ids.push(value.id);
+          });
+          this.loading = true;
+          removeFileCommon(ids)
+            .then(res => {
+              if (res.success) {
+                this.$message({
+                  type: "success",
+                  message: "删除成功!"
+                });
+                this.loading = true;
+                let data = {};
+                this.searchText = "";
+                data = {
+                  pageIndex: this.pageIndex,
+                  pageSize: this.pageSize,
+                  orderBy: this.orderBy
+                };
+                getFileCommon(data)
+                  .then(res => {
+                    if (res.success) {
+                      this.tableData = res.result.records;
+                      this.loading = false;
+                      this.total = Number(res.result.total);
+                      this.currentPage = res.result.current;
+                    }
+                  })
+                  .catch(err => {
+                    this.loading = false;
+                  });
+              }
+            })
+            .catch(() => {
+              this.loading = false;
+            });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
+    },
+    showFile() {
+      if (this.multipleSelection.length == 0) {
+        this.$message({
+          type: "warning",
+          message: "请选择一个文件类型进行预览"
+        });
+        return false;
+      }
+      this.showVisible = true;
+    },
+    handleSelectionChange(val) {
+      if (this.activeName == "其他文件管理") {
+        this.multipleSelection = val;
+      } else {
+        this.sqlData.multipleSelection = val;
+      }
+    },
+    handleSizeChange(val) {
+      if (this.activeName == "数据备份") {
+        let data = {};
+        this.sqlData.pageSize = val;
+        data = {
+          pageIndex: this.sqlData.pageIndex,
+          pageSize: this.sqlData.pageSize,
+          orderBy: this.sqlData.orderBy,
+          type: "数据库管理"
+        };
+        this.sqlData.loading = true;
+        getSQLFile(data)
+          .then(res => {
+            if (res.success) {
+              this.sqlData.tableData = res.result.records;
+              this.sqlData.loading = false;
+              this.sqlData.total = Number(res.result.total);
+              this.sqlData.currentPage = res.result.current;
+            }
+          })
+          .catch(err => {
+            this.sqlData.loading = false;
+          });
+      } else {
+        let data = {};
+        this.pageSize = val;
+        data = {
+          pageIndex: this.pageIndex,
+          pageSize: this.pageSize,
+          orderBy: this.orderBy
+        };
+        if (this.searchText) {
+          data["fileTypeName"] = this.searchText;
         }
         this.loading = true;
+        getFileCommon(data)
+          .then(res => {
+            if (res.success) {
+              this.tableData = res.result.records;
+              this.loading = false;
+              this.total = Number(res.result.total);
+              this.currentPage = res.result.current;
+            }
+          })
+          .catch(err => {
+            this.loading = false;
+          });
+      }
+    },
+    handleCurrentChange(val) {
+      if (this.activeName == "数据备份") {
+        let data = {};
+        this.sqlData.pageIndex = val;
+        data = {
+          pageIndex: this.sqlData.pageIndex,
+          pageSize: this.sqlData.pageSize,
+          orderBy: this.sqlData.orderBy,
+          type: "数据库管理"
+        };
+        this.sqlData.loading = true;
+        getSQLFile(data)
+          .then(res => {
+            if (res.success) {
+              this.sqlData.tableData = res.result.records;
+              this.sqlData.loading = false;
+              this.sqlData.total = Number(res.result.total);
+              this.sqlData.currentPage = res.result.current;
+            }
+          })
+          .catch(err => {
+            this.sqlData.loading = false;
+          });
+      } else {
+        this.loading = true;
+        let data = {};
+        this.pageIndex = val;
+        data = {
+          pageIndex: this.pageIndex,
+          pageSize: this.pageSize,
+          orderBy: this.orderBy
+        };
+        if (this.searchText) {
+          data["fileTypeName"] = this.searchText;
+        }
+        getFileCommon(data)
+          .then(res => {
+            if (res.success) {
+              this.tableData = res.result.records;
+              this.loading = false;
+              this.total = Number(res.result.total);
+              this.currentPage = res.result.current;
+            }
+          })
+          .catch(err => {
+            this.loading = false;
+          });
+      }
+    },
+    tableSort(row) {
+      let sortData = "";
+      if (row.order == "descending") {
+        sortData = row.prop + " desc";
+      } else {
+        sortData = row.prop;
+      }
+      if (this.activeName == "数据备份") {
+        let data = {};
+        data = {
+          pageIndex: this.sqlData.pageIndex,
+          pageSize: this.sqlData.pageSize,
+          orderBy: sortData,
+          type: "数据库管理"
+        };
+        this.sqlData.loading = true;
+        getSQLFile(data)
+          .then(res => {
+            if (res.success) {
+              this.sqlData.tableData = res.result.records;
+              this.sqlData.loading = false;
+              this.sqlData.total = Number(res.result.total);
+              this.sqlData.currentPage = res.result.current;
+            }
+          })
+          .catch(err => {
+            this.sqlData.loading = false;
+          });
+      } else {
+        let data = {};
+        data = {
+          pageIndex: 1,
+          pageSize: this.pageSize,
+          orderBy: sortData
+        };
+        if (this.searchText) {
+          data["fileTypeName"] = this.searchText;
+        }
+        this.loading = true;
+        getFileCommon(data)
+          .then(res => {
+            if (res.success) {
+              this.tableData = res.result.records;
+              this.loading = false;
+              this.total = Number(res.result.total);
+
+              this.currentPage = res.result.current;
+            }
+          })
+          .catch(err => {
+            this.loading = false;
+          });
+      }
+    },
+    handleClick(tab, event) {
+      if (tab.name == "其他文件管理") {
+        this.loading = true;
         let data = {
-            pageIndex: this.pageIndex,
-            pageSize: this.pageSize,
-            orderBy: this.orderBy
+          pageIndex: this.pageIndex,
+          pageSize: this.pageSize,
+          orderBy: this.orderBy
         };
         getFileCommon(data)
-            .then(res => {
-                if (res.success) {
-                    this.tableData = res.result.records;
-                    this.loading = false;
-                    this.total = Number(res.result.total);
-                    this.currentPage = res.result.current;
-                }
-            })
-            .catch(err => {
-                this.loading = false;
-            });
-    },
-    methods: {
-        turnUrl(url) {
-            if (url) {
-                window.open("http://" + url);
-            } else {
-                this.$message({
-                    type: "warning",
-                    message: "暂无链接"
-                });
+          .then(res => {
+            if (res.success) {
+              this.tableData = res.result.records;
+              this.loading = false;
+              this.total = Number(res.result.total);
+              this.currentPage = res.result.current;
             }
-        },
-        createSqlFile() {
-            addSQLFile()
-                .then(res => {
-                    if (res.success) {
-                        this.$message({
-                            type: "success",
-                            message: "数据备份成功"
-                        });
-                        this.sqlData.loading = true;
-                        let data = {
-                            pageIndex: this.sqlData.pageIndex,
-                            pageSize: this.sqlData.pageSize,
-                            orderBy: this.sqlData.orderBy,
-                            type: "数据库管理"
-                        };
-                        getSQLFile(data)
-                            .then(res => {
-                                if (res.success) {
-                                    this.sqlData.tableData = res.result.records;
-                                    this.sqlData.loading = false;
-                                    this.sqlData.total = Number(
-                                        res.result.total
-                                    );
-                                    this.sqlData.currentPage =
-                                        res.result.current;
-                                }
-                            })
-                            .catch(err => {
-                                this.sqlData.loading = false;
-                            });
-                    } else {
-                        this.sqlData.loading = false;
-                    }
-                })
-                .catch(err => {
-                    this.sqlData.loading = false;
-                });
-        },
-        restoreSqlFile() {
-            if (this.sqlData.multipleSelection.length != 1) {
-                this.$message({
-                    type: "warning",
-                    message: "请选择一个文件进行还原"
-                });
-                return false;
+          })
+          .catch(err => {
+            this.loading = false;
+          });
+      }
+      if (tab.name == "数据备份") {
+        this.sqlData.loading = true;
+        let data = {
+          pageIndex: this.sqlData.pageIndex,
+          pageSize: this.sqlData.pageSize,
+          orderBy: this.sqlData.orderBy,
+          type: "数据库管理"
+        };
+        getSQLFile(data)
+          .then(res => {
+            if (res.success) {
+              this.sqlData.tableData = res.result.records;
+              this.sqlData.loading = false;
+              this.sqlData.total = Number(res.result.total);
+              this.sqlData.currentPage = res.result.current;
             }
-            this.$confirm("此操作将还原数据库信息, 是否继续?", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning"
-            })
-                .then(() => {
-                    let id = "";
-                    id = this.sqlData.multipleSelection[0].id;
-                    this.sqlData.loading = true;
-
-                    resetSQLFile({ id: id })
-                        .then(res => {
-                            if (res.success) {
-                                this.$message({
-                                    type: "success",
-                                    message: "数据库还原成功!"
-                                });
-                                this.sqlData.loading = true;
-                                let data = {};
-                                data = {
-                                    pageIndex: this.sqlData.pageIndex,
-                                    pageSize: this.sqlData.pageSize,
-                                    orderBy: this.sqlData.orderBy,
-                                    type: "数据库管理"
-                                };
-                                getSQLFile(data)
-                                    .then(res => {
-                                        if (res.success) {
-                                            this.sqlData.tableData =
-                                                res.result.records;
-                                            this.sqlData.loading = false;
-                                            this.sqlData.total = Number(
-                                                res.result.total
-                                            );
-                                            this.sqlData.currentPage =
-                                                res.result.current;
-                                        }
-                                    })
-                                    .catch(err => {
-                                        this.sqlData.loading = false;
-                                    });
-                            }
-                        })
-                        .catch(() => {
-                            this.sqlData.loading = false;
-                        });
-                })
-                .catch(() => {
-                    this.$message({
-                        type: "info",
-                        message: "已取消删除"
-                    });
-                });
-        },
-        deleteSqlFile() {
-            if (this.sqlData.multipleSelection.length == 0) {
-                this.$message({
-                    type: "warning",
-                    message: "请选择至少一个文件进行删除"
-                });
-                return false;
-            }
-            this.$confirm("此操作将删除数据库信息, 是否继续?", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning"
-            })
-                .then(() => {
-                    let ids = [];
-                    this.sqlData.multipleSelection.map((value, index) => {
-                        ids.push(value.id);
-                    });
-                    this.sqlData.loading = true;
-
-                    deleteFile(ids)
-                        .then(res => {
-                            if (res.success) {
-                                this.$message({
-                                    type: "success",
-                                    message: "数据库备份删除成功!"
-                                });
-                                this.sqlData.loading = true;
-                                let data = {};
-                                data = {
-                                    pageIndex: this.sqlData.pageIndex,
-                                    pageSize: this.sqlData.pageSize,
-                                    orderBy: this.sqlData.orderBy,
-                                    type: "数据库管理"
-                                };
-                                getSQLFile(data)
-                                    .then(res => {
-                                        if (res.success) {
-                                            this.sqlData.tableData =
-                                                res.result.records;
-                                            this.sqlData.loading = false;
-                                            this.sqlData.total = Number(
-                                                res.result.total
-                                            );
-                                            this.sqlData.currentPage =
-                                                res.result.current;
-                                        }
-                                    })
-                                    .catch(err => {
-                                        this.sqlData.loading = false;
-                                    });
-                            }
-                        })
-                        .catch(() => {
-                            this.sqlData.loading = false;
-                        });
-                })
-                .catch(() => {
-                    this.$message({
-                        type: "info",
-                        message: "已取消删除"
-                    });
-                });
-        },
-        sreachData() {
-            let data = {};
-            data = {
-                pageIndex: 1,
-                pageSize: this.pageSize,
-                orderBy: this.orderBy
-            };
-            data["fileTypeName"] = this.searchText;
-            getFileCommon(data)
-                .then(res => {
-                    if (res.success) {
-                        this.tableData = res.result.records;
-                        this.loading = false;
-                        this.total = Number(res.result.total);
-                        this.currentPage = res.result.current;
-                    }
-                })
-                .catch(err => {
-                    this.loading = false;
-                });
-        },
-        submitFile(formName) {
-            let dealFun = function() {};
-            let submitData = {};
-            let files = [];
-            this.uploadData.materialfileList.forEach((value, index) => {
-                files.push({ id: value.response.result });
-            });
-            this.form["fileRecordList"] = files;
-            if (this.dialogTitle == "新增文件") {
-                dealFun = addFileCommon;
-
-                submitData = this.form;
-            } else {
-                dealFun = updateFileCommon;
-                for (let val in this.multipleSelection[0]) {
-                    if (this.form[val] !== undefined) {
-                        this.multipleSelection[0][val] = this.form[val];
-                    }
-                }
-                submitData = this.multipleSelection[0];
-            }
-            this.$refs[formName].validate(valid => {
-                if (valid) {
-                    this.uploadData.buttonFlag = true;
-                    dealFun(submitData)
-                        .then(res => {
-                            if (res.success) {
-                                this.uploadData.buttonFlag = false;
-                                this.dialogVisible = false;
-                                this.loading = true;
-                                this.searchText = "";
-                                let data = {
-                                    pageIndex: this.pageIndex,
-                                    pageSize: this.pageSize,
-                                    orderBy: this.orderBy
-                                };
-                                getFileCommon(data)
-                                    .then(res => {
-                                        if (res.success) {
-                                            this.tableData = res.result.records;
-                                            this.loading = false;
-                                            this.total = Number(
-                                                res.result.total
-                                            );
-                                            this.currentPage =
-                                                res.result.current;
-                                        }
-                                    })
-                                    .catch(err => {
-                                        this.loading = false;
-                                    });
-                            }
-                        })
-                        .catch(() => {
-                            this.uploadData.buttonFlag = false;
-                        });
-                } else {
-                    console.log("error submit!!");
-                    return false;
-                }
-            });
-        },
-        cancelSubmit(formName) {
-            this.dialogVisible = false;
-        },
-        closeDialog() {
-            this.$refs["form"].resetFields();
-            for (let value in this.form) {
-                this.form[value] = "";
-            }
-            this.uploadData.materialfileList = [];
-        },
-        createFile() {
-            this.dialogTitle = "新增文件";
-            this.dialogVisible = true;
-        },
-        modifyFile() {
-            if (this.multipleSelection.length == 0) {
-                this.$message({
-                    type: "warning",
-                    message: "请选择一个文件进行修改"
-                });
-                return false;
-            }
-            for (let value in this.form) {
-                this.form[value] = this.multipleSelection[0][value]
-                    ? this.multipleSelection[0][value]
-                    : "";
-            }
-            this.multipleSelection[0].fileRecordList.forEach((value, index) => {
-                this.uploadData.materialfileList.push({
-                    name: value.name,
-                    url: value.path,
-                    response: {
-                        result: value.id
-                    }
-                });
-            });
-
-            this.dialogTitle = "修改文件";
-            this.dialogVisible = true;
-        },
-        removeFile() {
-            if (this.multipleSelection.length == 0) {
-                this.$message({
-                    type: "warning",
-                    message: "请选择至少一个文件进行删除"
-                });
-                return false;
-            }
-            this.$confirm("此操作将永久删除该文件信息, 是否继续?", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning"
-            })
-                .then(() => {
-                    let ids = [];
-                    this.multipleSelection.map((value, index) => {
-                        ids.push(value.id);
-                    });
-                    this.loading = true;
-                    removeFileCommon(ids)
-                        .then(res => {
-                            if (res.success) {
-                                this.$message({
-                                    type: "success",
-                                    message: "删除成功!"
-                                });
-                                this.loading = true;
-                                let data = {};
-                                this.searchText = "";
-                                data = {
-                                    pageIndex: this.pageIndex,
-                                    pageSize: this.pageSize,
-                                    orderBy: this.orderBy
-                                };
-                                getFileCommon(data)
-                                    .then(res => {
-                                        if (res.success) {
-                                            this.tableData = res.result.records;
-                                            this.loading = false;
-                                            this.total = Number(
-                                                res.result.total
-                                            );
-                                            this.currentPage =
-                                                res.result.current;
-                                        }
-                                    })
-                                    .catch(err => {
-                                        this.loading = false;
-                                    });
-                            }
-                        })
-                        .catch(() => {
-                            this.loading = false;
-                        });
-                })
-                .catch(() => {
-                    this.$message({
-                        type: "info",
-                        message: "已取消删除"
-                    });
-                });
-        },
-        showFile() {
-            if (this.multipleSelection.length == 0) {
-                this.$message({
-                    type: "warning",
-                    message: "请选择一个文件类型进行预览"
-                });
-                return false;
-            }
-            this.showVisible = true;
-        },
-        handleSelectionChange(val) {
-            if (this.activeName == "其他文件管理") {
-                this.multipleSelection = val;
-            } else {
-                this.sqlData.multipleSelection = val;
-            }
-        },
-        handleSizeChange(val) {
-            if (this.activeName == "数据备份") {
-                let data = {};
-                this.sqlData.pageSize = val;
-                data = {
-                    pageIndex: this.sqlData.pageIndex,
-                    pageSize: this.sqlData.pageSize,
-                    orderBy: this.sqlData.orderBy,
-                    type: "数据库管理"
-                };
-                this.sqlData.loading = true;
-                getSQLFile(data)
-                    .then(res => {
-                        if (res.success) {
-                            this.sqlData.tableData = res.result.records;
-                            this.sqlData.loading = false;
-                            this.sqlData.total = Number(res.result.total);
-                            this.sqlData.currentPage = res.result.current;
-                        }
-                    })
-                    .catch(err => {
-                        this.sqlData.loading = false;
-                    });
-            } else {
-                let data = {};
-                this.pageSize = val;
-                data = {
-                    pageIndex: this.pageIndex,
-                    pageSize: this.pageSize,
-                    orderBy: this.orderBy
-                };
-                if (this.searchText) {
-                    data["fileTypeName"] = this.searchText;
-                }
-                this.loading = true;
-                getFileCommon(data)
-                    .then(res => {
-                        if (res.success) {
-                            this.tableData = res.result.records;
-                            this.loading = false;
-                            this.total = Number(res.result.total);
-                            this.currentPage = res.result.current;
-                        }
-                    })
-                    .catch(err => {
-                        this.loading = false;
-                    });
-            }
-        },
-        handleCurrentChange(val) {
-            if (this.activeName == "数据备份") {
-                let data = {};
-                this.sqlData.pageIndex = val;
-                data = {
-                    pageIndex: this.sqlData.pageIndex,
-                    pageSize: this.sqlData.pageSize,
-                    orderBy: this.sqlData.orderBy,
-                    type: "数据库管理"
-                };
-                this.sqlData.loading = true;
-                getSQLFile(data)
-                    .then(res => {
-                        if (res.success) {
-                            this.sqlData.tableData = res.result.records;
-                            this.sqlData.loading = false;
-                            this.sqlData.total = Number(res.result.total);
-                            this.sqlData.currentPage = res.result.current;
-                        }
-                    })
-                    .catch(err => {
-                        this.sqlData.loading = false;
-                    });
-            } else {
-                this.loading = true;
-                let data = {};
-                this.pageIndex = val;
-                data = {
-                    pageIndex: this.pageIndex,
-                    pageSize: this.pageSize,
-                    orderBy: this.orderBy
-                };
-                if (this.searchText) {
-                    data["fileTypeName"] = this.searchText;
-                }
-                getFileCommon(data)
-                    .then(res => {
-                        if (res.success) {
-                            this.tableData = res.result.records;
-                            this.loading = false;
-                            this.total = Number(res.result.total);
-                            this.currentPage = res.result.current;
-                        }
-                    })
-                    .catch(err => {
-                        this.loading = false;
-                    });
-            }
-        },
-        tableSort(row) {
-            let sortData = "";
-            if (row.order == "descending") {
-                sortData = row.prop + " desc";
-            } else {
-                sortData = row.prop;
-            }
-            if (this.activeName == "数据备份") {
-                let data = {};
-                data = {
-                    pageIndex: this.sqlData.pageIndex,
-                    pageSize: this.sqlData.pageSize,
-                    orderBy: sortData,
-                    type: "数据库管理"
-                };
-                this.sqlData.loading = true;
-                getSQLFile(data)
-                    .then(res => {
-                        if (res.success) {
-                            this.sqlData.tableData = res.result.records;
-                            this.sqlData.loading = false;
-                            this.sqlData.total = Number(res.result.total);
-                            this.sqlData.currentPage = res.result.current;
-                        }
-                    })
-                    .catch(err => {
-                        this.sqlData.loading = false;
-                    });
-            } else {
-                let data = {};
-                data = {
-                    pageIndex: 1,
-                    pageSize: this.pageSize,
-                    orderBy: sortData
-                };
-                if (this.searchText) {
-                    data["fileTypeName"] = this.searchText;
-                }
-                this.loading = true;
-                getFileCommon(data)
-                    .then(res => {
-                        if (res.success) {
-                            this.tableData = res.result.records;
-                            this.loading = false;
-                            this.total = Number(res.result.total);
-
-                            this.currentPage = res.result.current;
-                        }
-                    })
-                    .catch(err => {
-                        this.loading = false;
-                    });
-            }
-        },
-        handleClick(tab, event) {
-            if (tab.name == "其他文件管理") {
-                this.loading = true;
-                let data = {
-                    pageIndex: this.pageIndex,
-                    pageSize: this.pageSize,
-                    orderBy: this.orderBy
-                };
-                getFileCommon(data)
-                    .then(res => {
-                        if (res.success) {
-                            this.tableData = res.result.records;
-                            this.loading = false;
-                            this.total = Number(res.result.total);
-                            this.currentPage = res.result.current;
-                        }
-                    })
-                    .catch(err => {
-                        this.loading = false;
-                    });
-            }
-            if (tab.name == "数据备份") {
-                this.sqlData.loading = true;
-                let data = {
-                    pageIndex: this.sqlData.pageIndex,
-                    pageSize: this.sqlData.pageSize,
-                    orderBy: this.sqlData.orderBy,
-                    type: "数据库管理"
-                };
-                getSQLFile(data)
-                    .then(res => {
-                        if (res.success) {
-                            this.sqlData.tableData = res.result.records;
-                            this.sqlData.loading = false;
-                            this.sqlData.total = Number(res.result.total);
-                            this.sqlData.currentPage = res.result.current;
-                        }
-                    })
-                    .catch(err => {
-                        this.sqlData.loading = false;
-                    });
-            }
-        }
+          })
+          .catch(err => {
+            this.sqlData.loading = false;
+          });
+      }
     }
+  }
 };
 </script>
 <style lang="scss" scoped>
 .table-box {
-    margin-top: 10px;
-    max-width: 776px;
+  margin-top: 10px;
+  max-width: 776px;
 }
 .input_width {
-    width: 200px;
+  width: 200px;
 }
 .dialog-title {
-    border-left-width: 4px;
-    border-left-color: deepskyblue;
-    border-left-style: solid;
-    padding-left: 10px;
-    margin-bottom: 20px;
+  border-left-width: 4px;
+  border-left-color: deepskyblue;
+  border-left-style: solid;
+  padding-left: 10px;
+  margin-bottom: 20px;
 }
 .pagination-box {
-    margin: 10px auto;
-    text-align: center;
+  margin: 10px auto;
+  text-align: center;
 }
 .content {
-    margin-bottom: 10px;
-    margin-left: 10px;
-    border: #eeeeee 1px solid;
-    padding: 10px;
-    border-radius: 5px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  border: #eeeeee 1px solid;
+  padding: 10px;
+  border-radius: 5px;
 }
 .table-boxV2 {
-    margin-top: 10px;
-    max-width: 896px;
+  margin-top: 10px;
+  max-width: 896px;
 }
 </style>
 

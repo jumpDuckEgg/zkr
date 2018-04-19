@@ -56,7 +56,7 @@
                         <el-tag size='mini'>{{scope.row.validityDate?scope.row.validityDate:'暂无'}}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="tel" label="电话" width="120" align="center">
+                <el-table-column prop="tel" label="电话" width="120" align="center" show-overflow-tooltip>
                 </el-table-column>
                 <el-table-column label="地址" width="200" align="center">
                     <template slot-scope="scope">
@@ -75,7 +75,7 @@
                         <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.guide)">转跳</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column label="系统数据描述" width="270" align="center">
+                <el-table-column label="系统数据描述" width="270" align="center" >
                     <template slot-scope="scope">
                         <div class="overWord">
                             {{scope.row.desc}}

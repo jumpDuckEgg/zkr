@@ -44,7 +44,7 @@ export default {
       "http://182.61.47.252:9998/zkr/page/file/upload?type=" +
       this.uploadFolder;
     this.materialUploadUrl = url;
-    // console.log(this.materialUploadUrl);
+
     this.headData = { Authorization: `Bearer ${getToken()}` };
   },
   methods: {

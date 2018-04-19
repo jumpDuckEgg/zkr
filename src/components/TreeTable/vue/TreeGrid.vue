@@ -109,10 +109,10 @@ export default {
         },
         // 展开下级
         toggle: function(trIndex) {
-            console.log("我点击了" + trIndex);
+            // console.log("我点击了" + trIndex);
             let me = this;
             let record = me.data[trIndex];
-            console.log("record:", record);
+            // console.log("record:", record);
             record._expanded = !record._expanded;
         },
         // 显示层级关系的空格和图标

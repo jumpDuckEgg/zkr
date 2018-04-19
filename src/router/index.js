@@ -74,56 +74,9 @@ export const constantRouterMap = [
     ]
   },
   {
-    path: '/user',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'user',
-        component: () => import('@/views/user/index'),
-        meta: { title: '用户管理', icon: 'bussiness-man' }
-      }
-    ]
-  },
-  {
-    path: '/personManager',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'personManager',
-        component: () => import('@/views/personManager/index'),
-        meta: { title: '人员管理', icon: 'personal-center' }
-      }
-    ]
-  },
-  {
-    path: '/record',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'record',
-        component: () => import('@/views/record/index'),
-        meta: { title: '备案管理', icon: 'gonglue' }
-      }
-    ]
-  },
-  {
-    path: '/achievement',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'achievement',
-        component: () => import('@/views/achievement/index'),
-        meta: { title: '业绩管理', icon: 'all' }
-      }
-    ]
-  },
-  {
     path: '/bidding',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'index',
@@ -136,6 +89,7 @@ export const constantRouterMap = [
   {
     path: '/contract',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'index',
@@ -146,14 +100,67 @@ export const constantRouterMap = [
     ]
   },
   {
+    path: '/record',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'record',
+        component: () => import('@/views/record/index'),
+        meta: { title: '备案管理', icon: 'gonglue' }
+      }
+    ]
+  },
+  {
+    path: '/achievement',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'achievement',
+        component: () => import('@/views/achievement/index'),
+        meta: { title: '业绩管理', icon: 'all' }
+      }
+    ]
+  },
+  {
+    path: '/personManager',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'personManager',
+        component: () => import('@/views/personManager/index'),
+        meta: { title: '人员管理', icon: 'personal-center' }
+      }
+    ]
+  },
+  {
     path: '/file',
     component: Layout,
+    hidden: false,
     children: [
       {
         path: 'index',
         name: 'file',
         component: () => import('@/views/file/index'),
         meta: { title: '文件管理', icon: 'feiji' }
+      }
+    ]
+  },
+  {
+    path: '/user',
+    component: Layout,
+    hidden: false,
+    children: [
+      {
+        path: 'index',
+        name: 'user',
+        component: () => import('@/views/user/index'),
+        meta: { title: '用户管理', icon: 'bussiness-man' }
       }
     ]
   },

@@ -12,7 +12,7 @@
                 <el-button size="mini" type="primary" plain @click="createContract('zhu')">添加主包合同</el-button>
                 <el-button size="mini" type="success" plain @click="createContract('fen')">添加分包合同</el-button>
                 <el-button size="mini" type="info" plain @click="modifyContract">修改合同</el-button>
-                <el-button size="mini" type="info" plain @click="deleteContract">删除合同</el-button>
+                <el-button size="mini" type="info" plain @click="deleteContract" v-if='rolesFlag'>删除合同</el-button>
                 <el-button size="mini" type="danger" plain @click="showContract">预览</el-button>
             </el-col>
         </el-row>
@@ -246,6 +246,7 @@ export default {
     },
     data() {
         return {
+            rolesFlag:true,
             contractType: "",
             dialogTitle: "新增主包合同",
             showVisible: false,
@@ -425,6 +426,10 @@ export default {
     },
     filters: {},
     created() {
+        let roles = this.$store.state.user.roles;
+        if(roles == '普通用户'){
+            this.rolesFlag= false;
+        }
         this.loading = true;
         let data = {
             pageIndex: this.pageIndex,
@@ -539,8 +544,6 @@ export default {
                 }
                 submitData = this.multipleSelection[0];
             }
-            console.log(submitData);
-            // return false;
             this.$refs[formName].validate(valid => {
                 if (valid) {
                     this.uploadData.buttonFlag = true;

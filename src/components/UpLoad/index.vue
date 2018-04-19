@@ -44,18 +44,18 @@ export default {
       "http://182.61.47.252:9998/zkr/page/file/upload?type=" +
       this.uploadFolder;
     this.materialUploadUrl = url;
-    console.log(this.materialUploadUrl);
+    // console.log(this.materialUploadUrl);
     this.headData = { Authorization: `Bearer ${getToken()}` };
   },
   methods: {
     handleProgress() {
-      console.log("我在上传了");
+      // console.log("我在上传了");
 
       this.$emit("update:buttonFlag", true);
     },
     // 课件资源
     handleMaterialSuccess(response, file, fileList) {
-      console.log(fileList);
+      // console.log(fileList);
       this.$emit("update:materialfileList", fileList);
       this.$emit("update:buttonFlag", false);
     },

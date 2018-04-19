@@ -11,7 +11,7 @@
             <el-col>
                 <el-button size="mini" type="primary" plain @click="createdRecord">新增备案</el-button>
                 <el-button size="mini" type="success" plain @click="modifyRecord">修改备案</el-button>
-                <el-button size="mini" type="info" plain @click="deleteRecord">删除备案</el-button>
+                <el-button size="mini" type="info" plain @click="deleteRecord" v-if="rolesFlag">删除备案</el-button>
                 <el-button size="mini" type="danger" plain @click="showRecord">预览</el-button>
             </el-col>
         </el-row>
@@ -29,12 +29,12 @@
                 </el-table-column>
                 <el-table-column label="系统链接" width="80" align="center">
                     <template slot-scope="scope">
-                            <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.systemLink)">转跳</el-button>
+                        <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.systemLink)">转跳</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="登入入口" width="80" align="center">
                     <template slot-scope="scope">
-                            <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.loginLink)">转跳</el-button>
+                        <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.loginLink)">转跳</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column prop="account" label="账号" width="100" align="center">
@@ -72,7 +72,7 @@
                 </el-table-column>
                 <el-table-column label="办事指南" width="80" align="center">
                     <template slot-scope="scope">
-                            <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.guide)">转跳</el-button>
+                        <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.guide)">转跳</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="系统数据描述" width="270" align="center">
@@ -325,6 +325,7 @@ export default {
     },
     data() {
         return {
+            rolesFlag:true,
             uploadData: {
                 uploadFolder: "备案管理",
                 materialfileList: [],
@@ -387,6 +388,10 @@ export default {
     },
     filters: {},
     created() {
+         let roles = this.$store.state.user.roles;
+        if(roles == '普通用户'){
+            this.rolesFlag= false;
+        }
         this.loading = true;
         let data = {
             pageIndex: this.pageIndex,
@@ -410,7 +415,7 @@ export default {
         tableRowClassName({ row, rowIndex }) {
             let idValidity = row.validityDate
                 ? row.validityDate.split("-")
-                : "1996-10-30".split("-");
+                : "2080-10-30".split("-");
             let nowDay = new Date(
                 new Date().getFullYear(),
                 new Date().getMonth(),
@@ -754,7 +759,6 @@ export default {
 .content {
     margin-bottom: 10px;
     margin-left: 10px;
-    
 }
 .recordImage {
     width: 110px;

@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </el-tab-pane>
-            <el-tab-pane label="数据备份" name="数据备份">
+            <el-tab-pane label="数据备份" name="数据备份" v-if="rolesFlag">
                 <el-row type="flex" justify="start">
                     <el-col>
                         <el-button size="mini" type="primary" plain @click="createSqlFile">数据库备份</el-button>
@@ -155,6 +155,7 @@ export default {
     },
     data() {
         return {
+            rolesFlag:true,
             sqlData: {
                 loading: false,
                 tableData: [],
@@ -202,6 +203,10 @@ export default {
     },
     filters: {},
     created() {
+         let roles = this.$store.state.user.roles;
+        if(roles == '管理员'){
+            this.rolesFlag= false;
+        }
         this.loading = true;
         let data = {
             pageIndex: this.pageIndex,
@@ -346,7 +351,6 @@ export default {
                 type: "warning"
             })
                 .then(() => {
-                    console.log("asdasd");
                     let ids = [];
                     this.sqlData.multipleSelection.map((value, index) => {
                         ids.push(value.id);

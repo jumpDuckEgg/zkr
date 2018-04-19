@@ -167,7 +167,7 @@
             <el-option label="助理级" value="助理级"></el-option>
             <el-option label="中级" value="中级"></el-option>
             <el-option label="副高级" value="副高级"></el-option>
-            <el-option label="副高级" value="副高级"></el-option>
+            <el-option label="正高级" value="正高级"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="类型:" prop="type" label-width="50px">
@@ -575,10 +575,10 @@ export default {
     tableRowClassName({ row, rowIndex }) {
       let idValidity = row.idValidityDate
         ? row.idValidityDate.split("-")
-        : "1996-10-30".split("-");
+        : "2080-10-30".split("-");
       let validity = row.validityPeriod
         ? row.validityPeriod.split("-")
-        : "1996-10-30".split("-");
+        : "2080-10-30".split("-");
       let nowDay = new Date(
         new Date().getFullYear(),
         new Date().getMonth(),
@@ -601,6 +601,7 @@ export default {
         validityPeriod.getTime() - nowDay.getTime() < limitTime ||
         idValidityDate.getTime() - nowDay.getTime() < limitTime
       ) {
+
         return "warning-row";
       }
       return "";
@@ -610,7 +611,6 @@ export default {
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(val);
     },
     handleSizeChange(val) {
       this.loading = true;

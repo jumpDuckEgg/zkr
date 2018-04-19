@@ -570,7 +570,7 @@ export default {
             if (this.multipleSelection.length == 0) {
                 this.$message({
                     type: "warning",
-                    message: "请选择至少一个备案进行修改"
+                    message: "请选择一个备案进行修改"
                 });
                 return false;
             }
@@ -596,7 +596,7 @@ export default {
             if (this.multipleSelection.length == 0) {
                 this.$message({
                     type: "warning",
-                    message: "请选择至少一个备案进行预览"
+                    message: "请选择一个备案进行预览"
                 });
                 return false;
             }

@@ -110,478 +110,481 @@
 
 <script>
 import {
-  getUsersByPage,
-  createdUser,
-  removeUser,
-  modifyUser,
-  modifyPassword
+    getUsersByPage,
+    createdUser,
+    removeUser,
+    modifyUser,
+    modifyPassword
 } from "@/api/user.js";
 
 export default {
-  data() {
-    var validatePass = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请再次输入密码"));
-      } else if (value !== this.mdform.password) {
-        callback(new Error("两次输入密码不一致!"));
-      } else {
-        callback();
-      }
-    };
-    return {
-      dialogTitle: "修改密码",
-      submitFlag: false,
-      modifyFlag: false,
-      loading: false,
-      pageIndex: 1,
-      total: 1,
-      pageSize: 15,
-      currentPage: 1,
-      searchText: "",
-      select: "",
-      tableData: [],
-      multipleSelection: [],
-      dialogVisible: false,
-      modifyDialogVisible: false,
-      orderBy: "create_date desc",
-      form: {
-        name: "",
-        type: "",
-        password: "",
-        remark: ""
-      },
-      rules: {
-        name: [
-          {
-            required: true,
-            message: "请输入姓名",
-            trigger: "blur"
-          }
-        ],
-        type: [
-          {
-            required: true,
-            message: "请选择一个用户类型",
-            trigger: "change"
-          }
-        ],
-        password: [
-          {
-            required: true,
-            message: "请输入密码",
-            trigger: "blur"
-          }
-        ]
-      },
-      mdform: {
-        type: "",
-        password: "",
-        checkpassword: ""
-      },
-      mdrules: {
-        type: [
-          {
-            required: true,
-            message: "请选择一个用户类型",
-            trigger: "change"
-          }
-        ],
-        password: [
-          {
-            required: true,
-            message: "请输入密码",
-            trigger: "blur"
-          }
-        ],
-        checkpassword: [{ validator: validatePass, trigger: "blur" }]
-      }
-    };
-  },
-  filters: {},
-  created() {
-    this.loading = true;
-    let data = {
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      orderBy: this.orderBy
-    };
-    getUsersByPage(data)
-      .then(res => {
-        if (res.success) {
-          this.tableData = res.result.records;
-          this.loading = false;
-          this.total = Number(res.result.total);
-          this.currentPage = res.result.current;
-        }
-      })
-      .catch(err => {
-        this.loading = false;
-      });
-  },
-  methods: {
-    tableSort(row) {
-      let sortData = "";
-      if (row.order == "descending") {
-        sortData = row.prop + " desc";
-      } else {
-        sortData = row.prop;
-      }
-      let data = {};
-      data = {
-        pageIndex: 1,
-        pageSize: this.pageSize,
-        orderBy: sortData
-      };
-      this.loading = true;
-      getUsersByPage(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    sreachData() {
-      if (!this.select) {
-        this.$message({
-          type: "warning",
-          message: "请选择一个类型"
-        });
-        return false;
-      }
-      let data = {};
-      data = {
-        pageIndex: 1,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      data[this.select] = this.searchText;
-      getUsersByPage(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    checkModify(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          let modifyData = {};
-          if (this.dialogTitle == "修改密码") {
-            modifyPassword(
-              this.mdform.password,
-              this.multipleSelection[0].id
-            ).then(res => {
-              if (res.result) {
-                this.$message({
-                  type: "success",
-                  message: "修改密码成功"
-                });
-                this.mdform.password = "";
-                this.modifyDialogVisible = false;
-              }
-            });
-          }
-          if (this.dialogTitle == "修改权限") {
-            this.multipleSelection[0].type = this.mdform.type;
-            modifyData = this.multipleSelection[0];
-            modifyUser(modifyData)
-              .then(res => {
-                if (res.result) {
-                  this.$message({
-                    type: "success",
-                    message: "修改权限成功"
-                  });
-                  this.mdform.type = "";
-                }
-              })
-              .then(() => {
-                this.loading = true;
-                let data = {};
-                this.searchText = "";
-                data = {
-                  pageIndex: this.pageIndex,
-                  pageSize: this.pageSize,
-                  orderBy: this.orderBy
-                };
-                getUsersByPage(data)
-                  .then(res => {
-                    if (res.success) {
-                      this.tableData = res.result.records;
-                      this.loading = false;
-                      this.total = Number(res.result.total);
-                      this.currentPage = res.result.current;
-                      this.modifyDialogVisible = false;
+    data() {
+        var validatePass = (rule, value, callback) => {
+            if (value === "") {
+                callback(new Error("请再次输入密码"));
+            } else if (value !== this.mdform.password) {
+                callback(new Error("两次输入密码不一致!"));
+            } else {
+                callback();
+            }
+        };
+        return {
+            dialogTitle: "修改密码",
+            submitFlag: false,
+            modifyFlag: false,
+            loading: false,
+            pageIndex: 1,
+            total: 1,
+            pageSize: 15,
+            currentPage: 1,
+            searchText: "",
+            select: "",
+            tableData: [],
+            multipleSelection: [],
+            dialogVisible: false,
+            modifyDialogVisible: false,
+            orderBy: "create_date desc",
+            form: {
+                name: "",
+                type: "",
+                password: "",
+                remark: ""
+            },
+            rules: {
+                name: [
+                    {
+                        required: true,
+                        message: "请输入姓名",
+                        trigger: "blur"
                     }
-                  })
-                  .catch(err => {
-                    this.loading = false;
-                    this.modifyDialogVisible = false;
-                  });
-              });
-          }
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
+                ],
+                type: [
+                    {
+                        required: true,
+                        message: "请选择一个用户类型",
+                        trigger: "change"
+                    }
+                ],
+                password: [
+                    {
+                        required: true,
+                        message: "请输入密码",
+                        trigger: "blur"
+                    }
+                ]
+            },
+            mdform: {
+                type: "",
+                password: "",
+                checkpassword: ""
+            },
+            mdrules: {
+                type: [
+                    {
+                        required: true,
+                        message: "请选择一个用户类型",
+                        trigger: "change"
+                    }
+                ],
+                password: [
+                    {
+                        required: true,
+                        message: "请输入密码",
+                        trigger: "blur"
+                    }
+                ],
+                checkpassword: [{ validator: validatePass, trigger: "blur" }]
+            }
+        };
     },
-    cancelModify() {
-      this.modifyDialogVisible = false;
-    },
-    showDetail(detail) {
-      this.$alert(detail, "备注详情", {
-        confirmButtonText: "确定",
-        callback: action => {}
-      });
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    createdUser() {
-      this.dialogVisible = true;
-    },
-    modifyPassword() {
-      if (!(this.multipleSelection.length == 1)) {
-        this.$message({
-          type: "warning",
-          message: "请选择一个用户进行修改"
-        });
-        return false;
-      }
-      this.dialogTitle = "修改密码";
-      this.modifyDialogVisible = true;
-    },
-    modifyType() {
-      if (!(this.multipleSelection.length == 1)) {
-        this.$message({
-          type: "warning",
-          message: "请选择一个用户进行修改"
-        });
-        return false;
-      }
-      this.dialogTitle = "修改权限";
-      this.modifyDialogVisible = true;
-    },
-    cancelAddUser() {
-      this.form.name = "";
-      this.form.type = "";
-      this.form.password = "";
-      this.dialogVisible = false;
-      this.$message({
-        type: "info",
-        message: "取消添加用户"
-      });
-    },
-    submitUser(formName) {
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.submitFlag = true;
-          createdUser(this.form)
+    filters: {},
+    created() {
+        this.loading = true;
+        let data = {
+            pageIndex: this.pageIndex,
+            pageSize: this.pageSize,
+            orderBy: this.orderBy
+        };
+        getUsersByPage(data)
             .then(res => {
-              if (res.success) {
-                this.submitFlag = false;
-                this.$message({
-                  type: "success",
-                  message: "新增用户成功"
-                });
-                this.form.name = "";
-                this.form.type = "";
-                this.form.password = "";
-                this.form.remark = "";
-                this.dialogVisible = false;
-              } else {
-                this.submitFlag = false;
-                this.dialogVisible = false;
-                return Promise.reject();
-              }
-            })
-            .then(() => {
-              this.loading = true;
-              let data = {};
-              this.searchText = "";
-              data = {
-                pageIndex: this.pageIndex,
-                pageSize: this.pageSize,
-                orderBy: this.orderBy
-              };
-              getUsersByPage(data)
-                .then(res => {
-                  if (res.success) {
+                if (res.success) {
                     this.tableData = res.result.records;
                     this.loading = false;
                     this.total = Number(res.result.total);
                     this.currentPage = res.result.current;
-                  }
+                }
+            })
+            .catch(err => {
+                this.loading = false;
+            });
+    },
+    methods: {
+        tableSort(row) {
+            let sortData = "";
+            if (row.order == "descending") {
+                sortData = row.prop + " desc";
+            } else {
+                sortData = row.prop;
+            }
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize,
+                orderBy: sortData
+            };
+            this.loading = true;
+            getUsersByPage(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
+                    }
                 })
                 .catch(err => {
-                  this.loading = false;
+                    this.loading = false;
                 });
-            })
-            .catch(() => {});
-        } else {
-          console.log("error submit!!");
-          return false;
-        }
-      });
-    },
-    deleteUser() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个用户进行删除"
-        });
-        return false;
-      }
-      this.$confirm("此操作将永久删除该用户信息, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          let ids = [];
-          this.multipleSelection.map((value, index) => {
-            ids.push(value.id);
-          });
-          removeUser(ids)
-            .then(res => {
-              if (res.success) {
+        },
+        sreachData() {
+            if (!this.select) {
                 this.$message({
-                  type: "success",
-                  message: "删除成功!"
+                    type: "warning",
+                    message: "请选择一个类型"
                 });
-              }
+                return false;
+            }
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            data[this.select] = this.searchText;
+            getUsersByPage(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        },
+        checkModify(formName) {
+            this.$refs[formName].validate(valid => {
+                if (valid) {
+                    let modifyData = {};
+                    if (this.dialogTitle == "修改密码") {
+                        modifyPassword(
+                            this.mdform.password,
+                            this.multipleSelection[0].id
+                        ).then(res => {
+                            if (res.result) {
+                                this.$message({
+                                    type: "success",
+                                    message: "修改密码成功"
+                                });
+                                this.mdform.password = "";
+                                this.modifyDialogVisible = false;
+                            }
+                        });
+                    }
+                    if (this.dialogTitle == "修改权限") {
+                        this.multipleSelection[0].type = this.mdform.type;
+                        modifyData = this.multipleSelection[0];
+                        modifyUser(modifyData)
+                            .then(res => {
+                                if (res.result) {
+                                    this.$message({
+                                        type: "success",
+                                        message: "修改权限成功"
+                                    });
+                                    this.mdform.type = "";
+                                }
+                            })
+                            .then(() => {
+                                this.loading = true;
+                                let data = {};
+                                this.searchText = "";
+                                data = {
+                                    pageIndex: this.pageIndex,
+                                    pageSize: this.pageSize,
+                                    orderBy: this.orderBy
+                                };
+                                getUsersByPage(data)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                            this.modifyDialogVisible = false;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                        this.modifyDialogVisible = false;
+                                    });
+                            });
+                    }
+                } else {
+                    console.log("error submit!!");
+                    return false;
+                }
+            });
+        },
+        cancelModify() {
+            this.modifyDialogVisible = false;
+        },
+        showDetail(detail) {
+            this.$alert(detail, "备注详情", {
+                confirmButtonText: "确定",
+                callback: action => {}
+            });
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        createdUser() {
+            this.dialogVisible = true;
+        },
+        modifyPassword() {
+            if (!(this.multipleSelection.length == 1)) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个用户进行修改"
+                });
+                return false;
+            }
+            this.dialogTitle = "修改密码";
+            this.modifyDialogVisible = true;
+        },
+        modifyType() {
+            if (!(this.multipleSelection.length == 1)) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个用户进行修改"
+                });
+                return false;
+            }
+            this.dialogTitle = "修改权限";
+            this.modifyDialogVisible = true;
+        },
+        cancelAddUser() {
+            this.form.name = "";
+            this.form.type = "";
+            this.form.password = "";
+            this.dialogVisible = false;
+            this.$message({
+                type: "info",
+                message: "取消添加用户"
+            });
+        },
+        submitUser(formName) {
+            this.$refs[formName].validate(valid => {
+                if (valid) {
+                    this.submitFlag = true;
+                    createdUser(this.form)
+                        .then(res => {
+                            if (res.success) {
+                                this.submitFlag = false;
+                                this.$message({
+                                    type: "success",
+                                    message: "新增用户成功"
+                                });
+                                this.form.name = "";
+                                this.form.type = "";
+                                this.form.password = "";
+                                this.form.remark = "";
+                                this.dialogVisible = false;
+                            } else {
+                                this.submitFlag = false;
+                                this.dialogVisible = false;
+                                return Promise.reject();
+                            }
+                        })
+                        .then(() => {
+                            this.loading = true;
+                            let data = {};
+                            this.searchText = "";
+                            data = {
+                                pageIndex: this.pageIndex,
+                                pageSize: this.pageSize,
+                                orderBy: this.orderBy
+                            };
+                            getUsersByPage(data)
+                                .then(res => {
+                                    if (res.success) {
+                                        this.tableData = res.result.records;
+                                        this.loading = false;
+                                        this.total = Number(res.result.total);
+                                        this.currentPage = res.result.current;
+                                    }
+                                })
+                                .catch(err => {
+                                    this.loading = false;
+                                });
+                        })
+                        .catch(() => {});
+                } else {
+                    console.log("error submit!!");
+                    return false;
+                }
+            });
+        },
+        deleteUser() {
+            if (this.multipleSelection.length == 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择至少一个用户进行删除"
+                });
+                return false;
+            }
+            this.$confirm("此操作将永久删除该用户信息, 是否继续?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
             })
-            .then(() => {
-              this.loading = true;
-              let data = {};
-              this.searchText = "";
-              data = {
+                .then(() => {
+                    let ids = [];
+                    this.multipleSelection.map((value, index) => {
+                        ids.push(value.id);
+                    });
+                    removeUser(ids)
+                        .then(res => {
+                            if (res.success) {
+                                this.$message({
+                                    type: "success",
+                                    message: "删除成功!"
+                                });
+                            }
+                        })
+                        .then(() => {
+                            this.loading = true;
+                            let data = {};
+                            this.searchText = "";
+                            data = {
+                                pageIndex: this.pageIndex,
+                                pageSize: this.pageSize,
+                                orderBy: this.orderBy
+                            };
+                            getUsersByPage(data).then(res => {
+                                if (res.success) {
+                                    this.loading = false;
+                                    this.tableData = res.result.records;
+                                    this.total = Number(res.result.total);
+                                    this.currentPage = res.result.current;
+                                }
+                            });
+                        });
+                })
+                .catch(() => {
+                    this.$message({
+                        type: "info",
+                        message: "已取消删除"
+                    });
+                });
+        },
+        handleCurrentChange(val) {
+            this.loading = true;
+            let data = {};
+            this.pageIndex = val;
+            data = {
                 pageIndex: this.pageIndex,
                 pageSize: this.pageSize,
                 orderBy: this.orderBy
-              };
-              getUsersByPage(data).then(res => {
-                if (res.success) {
-                  this.tableData = res.result.records;
-                  this.total = Number(res.result.total);
-                  this.currentPage = res.result.current;
-                }
-              });
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    },
-    handleCurrentChange(val) {
-      this.loading = true;
-      let data = {};
-      this.pageIndex = val;
-      data = {
-        pageIndex: this.pageIndex,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      if (this.select && this.searchText) {
-        data[this.select] = this.searchText;
-      }
-      getUsersByPage(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
+            };
+            if (this.select && this.searchText) {
+                data[this.select] = this.searchText;
+            }
+            getUsersByPage(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
 
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    handleSizeChange(val) {
-      this.loading = true;
-      let data = {};
-      this.pageSize = val;
-      data = {
-        pageIndex: this.pageIndex,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      if (this.select && this.searchText) {
-        data[this.select] = this.searchText;
-      }
-      getUsersByPage(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    showPass() {
-      this.$refs.password.type = "text";
-    },
-    hidePass() {
-      this.$refs.password.type = "password";
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        },
+        handleSizeChange(val) {
+            this.loading = true;
+            let data = {};
+            this.pageSize = val;
+            data = {
+                pageIndex: this.pageIndex,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            if (this.select && this.searchText) {
+                data[this.select] = this.searchText;
+            }
+            getUsersByPage(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        },
+        showPass() {
+            this.$refs.password.type = "text";
+        },
+        hidePass() {
+            this.$refs.password.type = "password";
+        }
     }
-  }
 };
 </script>
 
 <style lang="scss" scoped>
 .table-box {
-  margin-top: 10px;
-  width: 506px;
+    margin-top: 10px;
+    width: 506px;
 }
 .input_width {
-  width: 200px;
+    width: 200px;
 }
 .dialog-title {
-  border-left-width: 4px;
-  border-left-color: deepskyblue;
-  border-left-style: solid;
-  padding-left: 10px;
-  margin-bottom: 20px;
+    border-left-width: 4px;
+    border-left-color: deepskyblue;
+    border-left-style: solid;
+    padding-left: 10px;
+    margin-bottom: 20px;
 }
 .pagination-box {
-  margin: 20px auto;
-  text-align: center;
+    margin: 20px auto;
+    text-align: center;
 }
 .overWord {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-right: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 50px;
 }
 .detail {
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translate(-20%, 40%);
-  cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(-20%, 40%);
+    cursor: pointer;
 }
 </style>
 

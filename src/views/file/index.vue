@@ -222,6 +222,16 @@ export default {
             });
     },
     methods: {
+        turnUrl(url) {
+            if (url) {
+                window.open("http://" + url);
+            } else {
+                this.$message({
+                    type: "warning",
+                    message: "暂无链接"
+                });
+            }
+        },
         createSqlFile() {
             addSQLFile()
                 .then(res => {

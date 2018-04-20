@@ -518,7 +518,7 @@ export default {
             this.dialogVisible = true;
         },
         modifyFile() {
-            if (this.multipleSelection.length == 0) {
+            if (this.multipleSelection.length!=1) {
                 this.$message({
                     type: "warning",
                     message: "请选择一个文件进行修改"
@@ -606,7 +606,7 @@ export default {
                 });
         },
         showFile() {
-            if (this.multipleSelection.length == 0) {
+            if (this.multipleSelection.length !=1) {
                 this.$message({
                     type: "warning",
                     message: "请选择一个文件类型进行预览"

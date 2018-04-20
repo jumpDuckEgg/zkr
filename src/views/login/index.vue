@@ -27,7 +27,9 @@
             </el-form-item>
 
             <div class="tips">
+               <el-tooltip class="item" effect="dark" content="最佳分辨率1920x1080" placement="bottom">
                 <span>投标经营，只要一个系统就够了！</span>
+               </el-tooltip>
             </div>
         </el-form>
     </div>

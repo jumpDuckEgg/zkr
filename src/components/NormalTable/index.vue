@@ -12,10 +12,10 @@
               <template v-if="checkDate(scope.row.createDate)&&column.text=='项目名称'">
                 <el-tag size="mini">N</el-tag>
               </template>
-              <template v-if="scope.row.type=='主标'&&column.text=='项目名称'&&tableType=='确定报名的项目'">
+              <template v-if="scope.row.type=='主标'&&column.text=='项目名称'&&(tableType!='跟踪中的项目'&&tableType!='确定不报名的项目')">
                 <el-tag size="mini">主</el-tag>
               </template>
-              <template v-if="scope.row.type=='陪标'&&column.text=='项目名称'&&tableType=='确定报名的项目'">
+              <template v-if="scope.row.type=='陪标'&&column.text=='项目名称'&&(tableType!='跟踪中的项目'&&tableType!='确定不报名的项目')">
                 <el-tag size="mini">陪</el-tag>
               </template>
               <span style="cursor:pointer" @click="handleClipboard(scope.row[column.field],$event)">

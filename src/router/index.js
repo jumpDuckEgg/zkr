@@ -95,7 +95,7 @@ export const constantRouterMap = [
         path: 'index',
         name: 'contract',
         component: () => import('@/views/contract/index'),
-        meta: { title: '合同管理', icon: 'bussiness-card' }
+        meta: { title: '合同管理', icon: 'survey' }
       }
     ]
   },
@@ -147,7 +147,7 @@ export const constantRouterMap = [
         path: 'index',
         name: 'file',
         component: () => import('@/views/file/index'),
-        meta: { title: '文件管理', icon: 'feiji' }
+        meta: { title: '文件管理', icon: 'form' }
       }
     ]
   },

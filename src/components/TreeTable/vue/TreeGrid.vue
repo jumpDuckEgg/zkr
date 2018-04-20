@@ -1,32 +1,32 @@
 <template>
-  <div>
-    <el-table v-loading='loading'  :data="data" border :row-style="showTr" stripe size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
-      <el-table-column type="selection" align="center" width="45"></el-table-column>
-      <el-table-column :label="column.text" v-for="(column,index) in columns" :key="index" :prop="column.prop" :sortable='column.sort' :width="column.width?column.width:''" header-align='center' :align="column.textAlign" show-overflow-tooltip>
-        <template slot-scope="props">
-          <span v-if="spaceIconShow(index)" v-for="(space, levelIndex) in props.row._level" :key='levelIndex' class="ms-tree-space"></span>
-          <template v-if="toggleIconShow(index,props.row)">
-            <i v-if="!props.row._expanded" class="el-icon-arrow-right" aria-hidden="true" @click="toggle(props.$index)"></i>
-            <i v-if="props.row._expanded" class="el-icon-arrow-down" aria-hidden="true" @click="toggle(props.$index)"></i>
-          </template>
-          <span v-else-if="index===0" class="ms-tree-space"></span>
-          <template v-if="column.type=='text'">
-            <template v-if="column.field=='priceDesc'||column.field=='paymentTerms'||column.field=='paymentItems'">
-              {{props.row[column.field]|deleteTags}}
-            </template>
-            <template v-else>
-              {{ props.row[column.field] }}
-            </template>
-          </template>
-          <template v-if="column.type=='file'">
-            <el-button type="danger" plain size="mini">查看</el-button>
-          </template>
+    <div>
+        <el-table v-loading='loading' :data="data" border :row-style="showTr" stripe size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
+            <el-table-column type="selection" align="center" width="45"></el-table-column>
+            <el-table-column :label="column.text" v-for="(column,index) in columns" :key="index" :prop="column.prop" :sortable='column.sort' :width="column.width?column.width:''" header-align='center' :align="column.textAlign" show-overflow-tooltip>
+                <template slot-scope="props">
+                    <span v-if="spaceIconShow(index)" v-for="(space, levelIndex) in props.row._level" :key='levelIndex' class="ms-tree-space"></span>
+                    <template v-if="toggleIconShow(index,props.row)">
+                        <i v-if="!props.row._expanded" class="el-icon-arrow-right" aria-hidden="true" @click="toggle(props.$index)"></i>
+                        <i v-if="props.row._expanded" class="el-icon-arrow-down" aria-hidden="true" @click="toggle(props.$index)"></i>
+                    </template>
+                    <span v-else-if="index===0" class="ms-tree-space"></span>
+                    <template v-if="column.type=='text'">
+                        <template v-if="column.field=='priceDesc'||column.field=='paymentTerms'||column.field=='paymentItems'">
+                            {{props.row[column.field]|deleteTags}}
+                        </template>
+                        <template v-else>
+                            {{ props.row[column.field] }}
+                        </template>
+                    </template>
+                    <template v-if="column.type=='file'">
+                        <el-button type="danger" plain size="mini" @click="showFileList(props.row.fileRecordList)">查看</el-button>
+                    </template>
 
-        </template>
+                </template>
 
-      </el-table-column>
-    </el-table>
-  </div>
+            </el-table-column>
+        </el-table>
+    </div>
 </template>
 <script>
 import Utils from "../utils/index.js";
@@ -148,6 +148,9 @@ export default {
             }
             // console.log(sortData)
             this.$emit("sort", sortData);
+        },
+        showFileList(data) {
+            this.$emit("fileList", data);
         }
     }
 };

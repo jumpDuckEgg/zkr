@@ -17,8 +17,7 @@
             </el-col>
         </el-row>
         <div class="table-box">
-            <tree-grid :columns="columns" :loading='loading' :tree-structure="true" :data-source="tableData" style="margin-top:10px;" @sort='tableSort' @multipleSelection='handleSelectionChange'></tree-grid>
-
+            <tree-grid :columns="columns" @fileList='showFileList' :loading='loading' :tree-structure="true" :data-source="tableData" style="margin-top:10px;" @sort='tableSort' @multipleSelection='handleSelectionChange'></tree-grid>
             <div class="pagination-box">
                 <el-pagination small layout="prev, pager,next,sizes,total" :total="total" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
                 </el-pagination>
@@ -166,7 +165,7 @@
                 文件列表：
                 <template v-if="multipleSelection[0]&& multipleSelection[0].fileRecordList">
                     <span class="fileItem" :key="index" v-for="(item,index) in multipleSelection[0].fileRecordList ">{{item.name}}
-                        <el-tag size="mini" @click.native="turnUrl('182.61.47.252:9998/zkr/page/file/get?id='+item.id)" style="cursor:pointer">下载</el-tag>
+                        <el-tag size="mini" @click.native="downUrl(item.id)" style="cursor:pointer">下载</el-tag>
                     </span>
                 </template>
                 <template v-if="multipleSelection[0]&& multipleSelection[0].fileRecordList&& multipleSelection[0].fileRecordList.length==0">
@@ -225,6 +224,9 @@
                 </template>
             </div>
         </el-dialog>
+        <el-dialog :visible.sync="showFileVisible" width="800px" @close='closeFileDialog'>
+            <files :fileList='fileListData' :clearFlag.sync='clearFlag'></files>
+        </el-dialog>
     </div>
 </template>
 
@@ -235,18 +237,24 @@ import {
     updateContract,
     removeContract
 } from "@/api/contract";
+import SERVER from '@/api/config';
 import TreeGrid from "@/components/treetable/vue/treegrid.vue";
 import upload from "@/components/UpLoad";
 import editor from "@/components/editor";
+import files from "@/components/FileList";
 export default {
     components: {
         editor,
         upload,
-        TreeGrid
+        TreeGrid,
+        files
     },
     data() {
         return {
-            rolesFlag:true,
+            clearFlag: false,
+            showFileVisible: false,
+            fileListData: [],
+            rolesFlag: true,
             contractType: "",
             dialogTitle: "新增主包合同",
             showVisible: false,
@@ -427,8 +435,8 @@ export default {
     filters: {},
     created() {
         let roles = this.$store.state.user.roles;
-        if(roles == '普通用户'){
-            this.rolesFlag= false;
+        if (roles == "普通用户") {
+            this.rolesFlag = false;
         }
         this.loading = true;
         let data = {
@@ -452,6 +460,16 @@ export default {
     },
 
     methods: {
+         downUrl(id) {
+            window.open(SERVER.BASE_URL + "/file/get?id=" + id);
+        },
+        closeFileDialog() {
+            this.clearFlag = true;
+        },
+        showFileList(data) {
+            this.fileListData = data;
+            this.showFileVisible = true;
+        },
         turnUrl(url) {
             if (url) {
                 window.open("http://" + url);
@@ -542,6 +560,18 @@ export default {
                         this.multipleSelection[0][val] = this.form[val];
                     }
                 }
+                if (
+                    this.multipleSelection[0].price == null ||
+                    this.multipleSelection[0].price == ""
+                ) {
+                    this.multipleSelection[0].price = 0;
+                }
+                if (
+                    this.multipleSelection[0].payment == null ||
+                    this.multipleSelection[0].price == ""
+                ) {
+                    this.multipleSelection[0].payment = 0;
+                }
                 submitData = this.multipleSelection[0];
             }
             this.$refs[formName].validate(valid => {
@@ -628,9 +658,12 @@ export default {
                 return false;
             }
             for (let value in this.form) {
-                this.form[value] = this.multipleSelection[0][value]
-                    ? this.multipleSelection[0][value]
-                    : "";
+                if (
+                    this.multipleSelection[0][value] !== null ||
+                    this.multipleSelection[0][value] !== undefined
+                ) {
+                    this.form[value] = this.multipleSelection[0][value];
+                }
             }
             this.multipleSelection[0].fileRecordList.forEach((value, index) => {
                 this.uploadData.materialfileList.push({

@@ -198,9 +198,9 @@
                         <span style="cursor:pointer" @click="handleClipboard(scope.row.projectScaleDesc,$event)">{{scope.row.projectScaleDesc}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="文件下载" width="120" align='center'>
+                <el-table-column label="文件查看" width="120" align='center'>
                     <template slot-scope="scope">
-                        <el-button size="mini">详情</el-button>
+                        <el-button size="mini" @click="showFileList(scope.row.fileRecordList)">详情</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="备注" width="180" align='center'>
@@ -491,7 +491,7 @@
                 文件列表：
                 <template v-if="multipleSelection[0]&& multipleSelection[0].fileRecordList">
                     <span class="fileItem" :key="index" v-for="(item,index) in multipleSelection[0].fileRecordList ">{{item.name}}
-                        <el-tag size="mini" @click.native="turnUrl('182.61.47.252:9998/zkr/page/file/get?id='+item.id)" style="cursor:pointer">下载</el-tag>
+                        <el-tag size="mini" @click.native="downUrl(item.id)" style="cursor:pointer">下载</el-tag>
                     </span>
                 </template>
                 <template v-if="multipleSelection[0]&& multipleSelection[0].fileRecordList.length==0">
@@ -506,553 +506,572 @@
                 </template>
             </div>
         </el-dialog>
+        <el-dialog :visible.sync="showFileVisible" width="800px" @close='closeFileDialog'>
+            <files :fileList='fileListData' :clearFlag.sync='clearFlag'></files>
+        </el-dialog>
     </div>
 </template>
 
 <script>
 import {
-  getAchievements,
-  addAchievement,
-  removeAchievement,
-  updateAchievement
+    getAchievements,
+    addAchievement,
+    removeAchievement,
+    updateAchievement
 } from "@/api/achievement";
+import SERVER from '@/api/config';
 import editor from "@/components/editor";
 import upload from "@/components/UpLoad";
 import clipboard from "@/utils/clipboard";
+import files from "@/components/FileList";
 export default {
-  components: {
-    editor,
-    upload
-  },
-  data() {
-    return {
-      sreachBoxFlag: false,
-      uploadData: {
-        uploadFolder: "业绩管理",
-        materialfileList: [],
-        limitFlieNumber: 100,
-        buttonFlag: false
-      },
-      dialogTitle: "新增业绩",
-      orderBy: "create_date desc",
-      multipleSelection: [],
-      tableData: [],
-      loading: false,
-      total: 0,
-      pageIndex: 1,
-      pageSize: 15,
-      currentPage: 1,
-      orderBy: "create_date desc",
-      dialogVisible: false,
-      showVisible: false,
-      searchForm: {
-        name: "",
-        type: "",
-        biddingTime: "",
-        contractTime: "",
-        firstDesignTime: "",
-        confirmTime: "",
-        projectLeader: "",
-        itemLeader: "",
-        surveyEnum: "",
-        designEnum: "",
-        constructionEnum: "",
-        consultingEnum: "",
-        designReplyEnum: "",
-        constructionReplyEnum: "",
-        attenderEnum: "",
-        evaluationEnum: "",
-        oversizeBridgeEnum: "",
-        interchangeEnum: "",
-        safetyFacilitiesEnum: "",
-        mechanicalEnum: "",
-        pipeGalleryEnum: "",
-        specialSoilEnum: "",
-        greeningEnum: "",
-        housingEnum: "",
-        bridgeHeight: "",
-        builtSafeFee: "",
-        builtUpArea: "",
-        contractPrice: "",
-        tunnelHeight: "",
-        projectMileage: ""
-      },
-      form: {
-        name: "",
-        type: "",
-        bridgeHeight: "",
-        builtSafeFee: "",
-        builtUpArea: "",
-        contractPrice: "",
-        tunnelHeight: "",
-        projectMileage: "",
-        biddingTime: "",
-        contractTime: "",
-        firstDesignTime: "",
-        confirmTime: "",
-        projectLeader: "",
-        itemLeader: "",
-        designWorkDesc: "",
-        projectScaleDesc: "",
-        bridgeDesc: "",
-        tunnelDesc: "",
-        otherDesc: "",
-        remark: "",
-        surveyEnum: "",
-        designEnum: "",
-        constructionEnum: "",
-        consultingEnum: "",
-        designReplyEnum: "",
-        constructionReplyEnum: "",
-        attenderEnum: "",
-        evaluationEnum: "",
-        oversizeBridgeEnum: "",
-        interchangeEnum: "",
-        safetyFacilitiesEnum: "",
-        mechanicalEnum: "",
-        pipeGalleryEnum: "",
-        specialSoilEnum: "",
-        greeningEnum: "",
-        housingEnum: ""
-      },
-      rules: {
-        name: [
-          {
-            required: true,
-            message: "请输入姓名",
-            trigger: "blur"
-          }
-        ],
-        type: [
-          {
-            required: true,
-            message: "请选择一个类型",
-            trigger: "change"
-          }
-        ]
-      }
-    };
-  },
-  filters: {},
-  created() {
-    this.loading = true;
-    let data = {
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      orderBy: this.orderBy
-    };
-    getAchievements(data)
-      .then(res => {
-        if (res.success) {
-          this.tableData = res.result.records;
-          this.loading = false;
-          this.total = Number(res.result.total);
-          this.currentPage = res.result.current;
-        }
-      })
-      .catch(err => {
-        this.loading = false;
-      });
-  },
-  methods: {
-    turnUrl(url) {
-      if (url) {
-        window.open("http://" + url);
-      } else {
-        this.$message({
-          type: "warning",
-          message: "暂无链接"
-        });
-      }
+    components: {
+        editor,
+        upload,
+        files
     },
-    handleClipboard(text, event) {
-      clipboard(text, event);
+    data() {
+        return {
+            clearFlag: false,
+            showFileVisible: false,
+            fileListData: [],
+            sreachBoxFlag: false,
+            uploadData: {
+                uploadFolder: "业绩管理",
+                materialfileList: [],
+                limitFlieNumber: 100,
+                buttonFlag: false
+            },
+            dialogTitle: "新增业绩",
+            orderBy: "create_date desc",
+            multipleSelection: [],
+            tableData: [],
+            loading: false,
+            total: 0,
+            pageIndex: 1,
+            pageSize: 15,
+            currentPage: 1,
+            orderBy: "create_date desc",
+            dialogVisible: false,
+            showVisible: false,
+            searchForm: {
+                name: "",
+                type: "",
+                biddingTime: "",
+                contractTime: "",
+                firstDesignTime: "",
+                confirmTime: "",
+                projectLeader: "",
+                itemLeader: "",
+                surveyEnum: "",
+                designEnum: "",
+                constructionEnum: "",
+                consultingEnum: "",
+                designReplyEnum: "",
+                constructionReplyEnum: "",
+                attenderEnum: "",
+                evaluationEnum: "",
+                oversizeBridgeEnum: "",
+                interchangeEnum: "",
+                safetyFacilitiesEnum: "",
+                mechanicalEnum: "",
+                pipeGalleryEnum: "",
+                specialSoilEnum: "",
+                greeningEnum: "",
+                housingEnum: "",
+                bridgeHeight: "",
+                builtSafeFee: "",
+                builtUpArea: "",
+                contractPrice: "",
+                tunnelHeight: "",
+                projectMileage: ""
+            },
+            form: {
+                name: "",
+                type: "",
+                bridgeHeight: "",
+                builtSafeFee: "",
+                builtUpArea: "",
+                contractPrice: "",
+                tunnelHeight: "",
+                projectMileage: "",
+                biddingTime: "",
+                contractTime: "",
+                firstDesignTime: "",
+                confirmTime: "",
+                projectLeader: "",
+                itemLeader: "",
+                designWorkDesc: "",
+                projectScaleDesc: "",
+                bridgeDesc: "",
+                tunnelDesc: "",
+                otherDesc: "",
+                remark: "",
+                surveyEnum: "",
+                designEnum: "",
+                constructionEnum: "",
+                consultingEnum: "",
+                designReplyEnum: "",
+                constructionReplyEnum: "",
+                attenderEnum: "",
+                evaluationEnum: "",
+                oversizeBridgeEnum: "",
+                interchangeEnum: "",
+                safetyFacilitiesEnum: "",
+                mechanicalEnum: "",
+                pipeGalleryEnum: "",
+                specialSoilEnum: "",
+                greeningEnum: "",
+                housingEnum: ""
+            },
+            rules: {
+                name: [
+                    {
+                        required: true,
+                        message: "请输入姓名",
+                        trigger: "blur"
+                    }
+                ],
+                type: [
+                    {
+                        required: true,
+                        message: "请选择一个类型",
+                        trigger: "change"
+                    }
+                ]
+            }
+        };
     },
-    tableSort(row) {
-      let sortData = "";
-      if (row.order == "descending") {
-        sortData = row.prop + " desc";
-      } else {
-        sortData = row.prop;
-      }
-      let data = {};
-      data = {
-        pageIndex: 1,
-        pageSize: this.pageSize,
-        orderBy: sortData
-      };
-      let searchData = {};
-      for (let val in this.searchForm) {
-        if (this.searchForm[val]) {
-          searchData[val] = this.searchForm[val];
-        }
-      }
-      Object.assign(data, searchData);
-      this.loading = true;
-      getAchievements(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    resetSreachData() {
-      for (let val in this.searchForm) {
-        this.searchForm[val] = "";
-      }
-    },
-    sreachData() {
-      let data = {};
-      data = {
-        pageIndex: 1,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      let searchData = {};
-      for (let val in this.searchForm) {
-        if (this.searchForm[val]) {
-          searchData[val] = this.searchForm[val];
-        }
-      }
-      Object.assign(data, searchData);
-      this.loading = true;
-      getAchievements(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    handleSizeChange(val) {
-      this.loading = true;
-      let data = {};
-      this.pageSize = val;
-      data = {
-        pageIndex: this.pageIndex,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      let searchData = {};
-      for (let val in this.searchForm) {
-        if (this.searchForm[val]) {
-          searchData[val] = this.searchForm[val];
-        }
-      }
-      Object.assign(data, searchData);
-      getAchievements(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    showAchievement() {
-      if (this.multipleSelection.length != 1) {
-        this.$message({
-          type: "warning",
-          message: "请选择一个业绩进行查看"
-        });
-        return false;
-      }
-      this.showVisible = true;
-    },
-    createdAchievement() {
-      this.dialogTitle = "新增业绩";
-      this.dialogVisible = true;
-    },
-    modifyAchievement() {
-      if (this.multipleSelection.length !== 1) {
-        this.$message({
-          type: "warning",
-          message: "请选择一个业绩进行修改"
-        });
-        return false;
-      }
-      for (let value in this.form) {
-        this.form[value] = this.multipleSelection[0][value]
-          ? this.multipleSelection[0][value]
-          : "";
-      }
-      this.multipleSelection[0].fileRecordList.forEach((value, index) => {
-        this.uploadData.materialfileList.push({
-          name: value.name,
-          url: value.path,
-          response: {
-            result: value.id
-          }
-        });
-      });
-      this.dialogTitle = "修改业绩";
-      this.dialogVisible = true;
-    },
-    deleteAchievement() {
-      if (this.multipleSelection.length == 0) {
-        this.$message({
-          type: "warning",
-          message: "请选择至少一个备案进行删除"
-        });
-        return false;
-      }
-      this.$confirm("此操作将永久删除该备案信息, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          let ids = [];
-          this.multipleSelection.map((value, index) => {
-            ids.push(value.id);
-          });
-          this.loading = true;
-          removeAchievement(ids)
+    filters: {},
+    created() {
+        this.loading = true;
+        let data = {
+            pageIndex: this.pageIndex,
+            pageSize: this.pageSize,
+            orderBy: this.orderBy
+        };
+        getAchievements(data)
             .then(res => {
-              if (res.success) {
-                this.$message({
-                  type: "success",
-                  message: "删除成功!"
+                if (res.success) {
+                    this.tableData = res.result.records;
+                    this.loading = false;
+                    this.total = Number(res.result.total);
+                    this.currentPage = res.result.current;
+                }
+            })
+            .catch(err => {
+                this.loading = false;
+            });
+    },
+    methods: {
+        closeFileDialog() {
+            this.clearFlag = true;
+        },
+        showFileList(data) {
+            this.fileListData = data;
+            console.log(data);
+            this.showFileVisible = true;
+        },
+        downUrl(id) {
+            window.open(SERVER.BASE_URL + "/file/get?id=" + id);
+        },
+        handleClipboard(text, event) {
+            clipboard(text, event);
+        },
+        tableSort(row) {
+            let sortData = "";
+            if (row.order == "descending") {
+                sortData = row.prop + " desc";
+            } else {
+                sortData = row.prop;
+            }
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize,
+                orderBy: sortData
+            };
+            let searchData = {};
+            for (let val in this.searchForm) {
+                if (this.searchForm[val]) {
+                    searchData[val] = this.searchForm[val];
+                }
+            }
+            Object.assign(data, searchData);
+            this.loading = true;
+            getAchievements(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
                 });
-                this.loading = true;
-                let data = {};
-                this.searchText = "";
-                data = {
-                  pageIndex: this.pageIndex,
-                  pageSize: this.pageSize,
-                  orderBy: this.orderBy
-                };
-                let searchData = {};
-                for (let val in this.searchForm) {
-                  this.searchForm[val] = "";
+        },
+        resetSreachData() {
+            for (let val in this.searchForm) {
+                this.searchForm[val] = "";
+            }
+        },
+        sreachData() {
+            let data = {};
+            data = {
+                pageIndex: 1,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            let searchData = {};
+            for (let val in this.searchForm) {
+                if (this.searchForm[val]) {
+                    searchData[val] = this.searchForm[val];
                 }
-                getAchievements(data)
-                  .then(res => {
+            }
+            Object.assign(data, searchData);
+            this.loading = true;
+            getAchievements(data)
+                .then(res => {
                     if (res.success) {
-                      this.tableData = res.result.records;
-                      this.loading = false;
-                      this.total = Number(res.result.total);
-                      this.currentPage = res.result.current;
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+
+                        this.currentPage = res.result.current;
                     }
-                  })
-                  .catch(err => {
+                })
+                .catch(err => {
                     this.loading = false;
-                  });
-              }
-            })
-            .catch(() => {
-              this.loading = false;
-            });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除"
-          });
-        });
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
-    },
-    handleCurrentChange(val) {
-      this.loading = true;
-      let data = {};
-      this.pageIndex = val;
-      data = {
-        pageIndex: this.pageIndex,
-        pageSize: this.pageSize,
-        orderBy: this.orderBy
-      };
-      let searchData = {};
-      for (let val in this.searchForm) {
-        if (this.searchForm[val]) {
-          searchData[val] = this.searchForm[val];
-        }
-      }
-      Object.assign(data, searchData);
-      getAchievements(data)
-        .then(res => {
-          if (res.success) {
-            this.tableData = res.result.records;
-            this.loading = false;
-            this.total = Number(res.result.total);
-            this.currentPage = res.result.current;
-          }
-        })
-        .catch(err => {
-          this.loading = false;
-        });
-    },
-    submitInfo(formName) {
-      let dealFun = function() {};
-      let submitData = {};
-      let files = [];
-      this.uploadData.materialfileList.forEach((value, index) => {
-        files.push({ id: value.response.result });
-      });
-      this.form["fileRecordList"] = files;
-      this.form.otherDesc = this.$refs.otherDesc.content;
-      this.form.itemLeader = this.$refs.itemLeader.content;
-      if (this.dialogTitle == "新增业绩") {
-        dealFun = addAchievement;
-        submitData = this.form;
-      } else {
-        dealFun = updateAchievement;
-        for (let val in this.multipleSelection[0]) {
-          if (this.form[val] !== undefined) {
-            this.multipleSelection[0][val] = this.form[val];
-          }
-        }
-        submitData = this.multipleSelection[0];
-      }
-      this.$refs[formName].validate(valid => {
-        if (valid) {
-          this.uploadData.buttonFlag = true;
-          dealFun(submitData)
-            .then(res => {
-              if (res.success) {
-                this.uploadData.buttonFlag = false;
-                this.dialogVisible = false;
-                this.loading = true;
-                this.searchText = "";
-                let data = {
-                  pageIndex: this.pageIndex,
-                  pageSize: this.pageSize,
-                  orderBy: this.orderBy
-                };
-                for (let val in this.searchForm) {
-                  this.searchForm[val] = "";
+                });
+        },
+        handleSizeChange(val) {
+            this.loading = true;
+            let data = {};
+            this.pageSize = val;
+            data = {
+                pageIndex: this.pageIndex,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            let searchData = {};
+            for (let val in this.searchForm) {
+                if (this.searchForm[val]) {
+                    searchData[val] = this.searchForm[val];
                 }
-                getAchievements(data)
-                  .then(res => {
+            }
+            Object.assign(data, searchData);
+            getAchievements(data)
+                .then(res => {
                     if (res.success) {
-                      this.tableData = res.result.records;
-                      this.loading = false;
-                      this.total = Number(res.result.total);
-                      this.currentPage = res.result.current;
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
                     }
-                  })
-                  .catch(err => {
+                })
+                .catch(err => {
                     this.loading = false;
-                  });
-              }
-            })
-            .catch(() => {
-              this.uploadData.buttonFlag = false;
+                });
+        },
+        showAchievement() {
+            if (this.multipleSelection.length != 1) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个业绩进行查看"
+                });
+                return false;
+            }
+            this.showVisible = true;
+        },
+        createdAchievement() {
+            this.dialogTitle = "新增业绩";
+            this.dialogVisible = true;
+        },
+        modifyAchievement() {
+            if (this.multipleSelection.length !== 1) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择一个业绩进行修改"
+                });
+                return false;
+            }
+            for (let value in this.form) {
+                if (
+                    this.multipleSelection[0][value] !== null ||
+                    this.multipleSelection[0][value] !== undefined
+                ) {
+                    this.form[value] = this.multipleSelection[0][value];
+                }
+            }
+            this.multipleSelection[0].fileRecordList.forEach((value, index) => {
+                this.uploadData.materialfileList.push({
+                    name: value.name,
+                    url: value.path,
+                    response: {
+                        result: value.id
+                    }
+                });
             });
-        } else {
-          console.log("error submit!!");
-          return false;
+            this.dialogTitle = "修改业绩";
+            this.dialogVisible = true;
+        },
+        deleteAchievement() {
+            if (this.multipleSelection.length == 0) {
+                this.$message({
+                    type: "warning",
+                    message: "请选择至少一个备案进行删除"
+                });
+                return false;
+            }
+            this.$confirm("此操作将永久删除该备案信息, 是否继续?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning"
+            })
+                .then(() => {
+                    let ids = [];
+                    this.multipleSelection.map((value, index) => {
+                        ids.push(value.id);
+                    });
+                    this.loading = true;
+                    removeAchievement(ids)
+                        .then(res => {
+                            if (res.success) {
+                                this.$message({
+                                    type: "success",
+                                    message: "删除成功!"
+                                });
+                                this.loading = true;
+                                let data = {};
+                                this.searchText = "";
+                                data = {
+                                    pageIndex: this.pageIndex,
+                                    pageSize: this.pageSize,
+                                    orderBy: this.orderBy
+                                };
+                                let searchData = {};
+                                for (let val in this.searchForm) {
+                                    this.searchForm[val] = "";
+                                }
+                                getAchievements(data)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            this.loading = false;
+                        });
+                })
+                .catch(() => {
+                    this.$message({
+                        type: "info",
+                        message: "已取消删除"
+                    });
+                });
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
+        handleCurrentChange(val) {
+            this.loading = true;
+            let data = {};
+            this.pageIndex = val;
+            data = {
+                pageIndex: this.pageIndex,
+                pageSize: this.pageSize,
+                orderBy: this.orderBy
+            };
+            let searchData = {};
+            for (let val in this.searchForm) {
+                if (this.searchForm[val]) {
+                    searchData[val] = this.searchForm[val];
+                }
+            }
+            Object.assign(data, searchData);
+            getAchievements(data)
+                .then(res => {
+                    if (res.success) {
+                        this.tableData = res.result.records;
+                        this.loading = false;
+                        this.total = Number(res.result.total);
+                        this.currentPage = res.result.current;
+                    }
+                })
+                .catch(err => {
+                    this.loading = false;
+                });
+        },
+        submitInfo(formName) {
+            let dealFun = function() {};
+            let submitData = {};
+            let files = [];
+            this.uploadData.materialfileList.forEach((value, index) => {
+                files.push({ id: value.response.result });
+            });
+            this.form["fileRecordList"] = files;
+            this.form.otherDesc = this.$refs.otherDesc.content;
+            this.form.itemLeader = this.$refs.itemLeader.content;
+            if (this.dialogTitle == "新增业绩") {
+                dealFun = addAchievement;
+                submitData = this.form;
+            } else {
+                dealFun = updateAchievement;
+                for (let val in this.multipleSelection[0]) {
+                    if (this.form[val] !== undefined) {
+                        this.multipleSelection[0][val] = this.form[val];
+                    }
+                }
+                submitData = this.multipleSelection[0];
+            }
+            this.$refs[formName].validate(valid => {
+                if (valid) {
+                    this.uploadData.buttonFlag = true;
+                    dealFun(submitData)
+                        .then(res => {
+                            if (res.success) {
+                                this.uploadData.buttonFlag = false;
+                                this.dialogVisible = false;
+                                this.loading = true;
+                                this.searchText = "";
+                                let data = {
+                                    pageIndex: this.pageIndex,
+                                    pageSize: this.pageSize,
+                                    orderBy: this.orderBy
+                                };
+                                for (let val in this.searchForm) {
+                                    this.searchForm[val] = "";
+                                }
+                                getAchievements(data)
+                                    .then(res => {
+                                        if (res.success) {
+                                            this.tableData = res.result.records;
+                                            this.loading = false;
+                                            this.total = Number(
+                                                res.result.total
+                                            );
+                                            this.currentPage =
+                                                res.result.current;
+                                        }
+                                    })
+                                    .catch(err => {
+                                        this.loading = false;
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            this.uploadData.buttonFlag = false;
+                        });
+                } else {
+                    console.log("error submit!!");
+                    return false;
+                }
+            });
+        },
+        cancelSubmit(formName) {
+            this.dialogVisible = false;
+        },
+        closeDialog() {
+            this.$refs["form"].resetFields();
+            for (let value in this.form) {
+                this.form[value] = "";
+            }
+            this.$refs.itemLeader.content = "";
+            this.$refs.otherDesc.content = "";
+            this.uploadData.materialfileList = [];
         }
-      });
-    },
-    cancelSubmit(formName) {
-      this.dialogVisible = false;
-    },
-    closeDialog() {
-      this.$refs["form"].resetFields();
-      for (let value in this.form) {
-        this.form[value] = "";
-      }
-      this.$refs.itemLeader.content = "";
-      this.$refs.otherDesc.content = "";
-      this.uploadData.materialfileList = [];
     }
-  }
 };
 </script>
 <style lang="scss" scoped>
 .table-box {
-  margin-top: 10px;
-  max-width: 1576px;
+    margin-top: 10px;
+    max-width: 1576px;
 }
 .input_width {
-  width: 200px;
+    width: 200px;
 }
 .input_widthV2 {
-  width: 120px;
+    width: 120px;
 }
 .dialog-title {
-  border-left-width: 4px;
-  border-left-color: deepskyblue;
-  border-left-style: solid;
-  padding-left: 10px;
-  margin-bottom: 20px;
-}
-.pagination-box {
-  margin: 10px auto;
-  text-align: center;
-}
-.overWord {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.content {
-  margin-bottom: 10px;
-  margin-left: 10px;
-  border: #eeeeee 1px solid;
-  padding: 10px;
-  border-radius: 5px;
-}
-.searchBox {
-  position: relative;
-  margin: 10px 0;
-  //   background-color: burlywood;
-  border: 1px #eee solid;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 13px;
-  color: #808183;
-  &_margin {
-    margin-left: 5px;
-  }
-  &-item {
-    margin: 10px 0;
-    margin-left: 5px;
-  }
-  &-title {
     border-left-width: 4px;
     border-left-color: deepskyblue;
     border-left-style: solid;
     padding-left: 10px;
-  }
+    margin-bottom: 20px;
+}
+.pagination-box {
+    margin: 10px auto;
+    text-align: center;
+}
+.overWord {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.content {
+    margin-bottom: 10px;
+    margin-left: 10px;
+    border: #eeeeee 1px solid;
+    padding: 10px;
+    border-radius: 5px;
+}
+.searchBox {
+    position: relative;
+    margin: 10px 0;
+    //   background-color: burlywood;
+    border: 1px #eee solid;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 13px;
+    color: #808183;
+    &_margin {
+        margin-left: 5px;
+    }
+    &-item {
+        margin: 10px 0;
+        margin-left: 5px;
+    }
+    &-title {
+        border-left-width: 4px;
+        border-left-color: deepskyblue;
+        border-left-style: solid;
+        padding-left: 10px;
+    }
 }
 .search_down {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  cursor: pointer;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
 }
 .overWordV2 {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-right: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 50px;
 }
 .detail {
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translate(-20%, 40%);
-  cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(-20%, 40%);
+    cursor: pointer;
 }
 </style>
 

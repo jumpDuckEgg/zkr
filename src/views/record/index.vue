@@ -65,9 +65,9 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column label="相关文件下载" width="100" align="center">
+                <el-table-column label="相关文件" width="100" align="center">
                     <template slot-scope="scope">
-                        <el-button type="danger" plain size="mini">查看</el-button>
+                        <el-button type="danger" plain size="mini"  @click="showFileList(scope.row.fileRecordList)">查看</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="办事指南" width="80" align="center">
@@ -75,7 +75,7 @@
                         <el-button type="danger" plain size="mini" @click="turnUrl(scope.row.guide)">转跳</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column label="系统数据描述" width="270" align="center" >
+                <el-table-column label="系统数据描述" width="270" align="center">
                     <template slot-scope="scope">
                         <div class="overWord">
                             {{scope.row.desc}}
@@ -290,7 +290,7 @@
                 文件列表：
                 <template v-if="multipleSelection[0]&& multipleSelection[0].fileRecordList">
                     <span class="fileItem" :key="index" v-for="(item,index) in multipleSelection[0].fileRecordList ">{{item.name}}
-                        <el-tag size="mini" @click.native="turnUrl('182.61.47.252:9998/zkr/page/file/get?id='+item.id)" style="cursor:pointer">下载</el-tag>
+                        <el-tag size="mini" @click.native="downUrl(item.id)" style="cursor:pointer">下载</el-tag>
                     </span>
                 </template>
                 <template v-if="multipleSelection[0]&& multipleSelection[0].fileRecordList.length==0">
@@ -304,7 +304,9 @@
                     <el-tag size="mini" type="danger">暂无备注</el-tag>
                 </template>
             </div>
-
+        </el-dialog>
+        <el-dialog :visible.sync="showFileVisible" width="800px" @close='closeFileDialog'>
+            <files :fileList='fileListData' :clearFlag.sync='clearFlag'></files>
         </el-dialog>
     </div>
 </template>
@@ -319,13 +321,19 @@ import {
 import upload from "@/components/UpLoad";
 import citys from "./city";
 import recordImage from "@/assets/record/isalter.png";
+import files from "@/components/FileList";
+import SERVER from '@/api/config';
 export default {
     components: {
-        upload
+        upload,
+        files
     },
     data() {
         return {
-            rolesFlag:true,
+            clearFlag: false,
+            showFileVisible: false,
+            fileListData: [],
+            rolesFlag: true,
             uploadData: {
                 uploadFolder: "备案管理",
                 materialfileList: [],
@@ -388,9 +396,9 @@ export default {
     },
     filters: {},
     created() {
-         let roles = this.$store.state.user.roles;
-        if(roles == '普通用户'){
-            this.rolesFlag= false;
+        let roles = this.$store.state.user.roles;
+        if (roles == "普通用户") {
+            this.rolesFlag = false;
         }
         this.loading = true;
         let data = {
@@ -412,6 +420,16 @@ export default {
             });
     },
     methods: {
+        closeFileDialog() {
+            this.clearFlag = true;
+        },
+        showFileList(data) {
+            this.fileListData = data;
+            this.showFileVisible = true;
+        },
+        downUrl(id) {
+            window.open(SERVER.BASE_URL + "/file/get?id=" + id);
+        },
         tableRowClassName({ row, rowIndex }) {
             let idValidity = row.validityDate
                 ? row.validityDate.split("-")

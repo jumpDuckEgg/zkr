@@ -200,7 +200,7 @@
                 </el-table-column>
                 <el-table-column label="文件查看" width="120" align='center'>
                     <template slot-scope="scope">
-                        <el-button size="mini" @click="showFileList(scope.row.fileRecordList)">详情</el-button>
+                        <el-button size="mini" @click="showFileList(scope.row.fileRecordList)" type="danger" plain>查看</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="备注" width="180" align='center'>

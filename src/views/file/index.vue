@@ -29,7 +29,7 @@
             </el-table-column>
             <el-table-column label="文件查看" width="120" align="center">
               <template slot-scope="scope">
-                <el-button type="danger" size="mini" @click="showFileList(scope.row.fileRecordList)">查看</el-button>
+                <el-button type="danger" size="mini" @click="showFileList(scope.row.fileRecordList)" plain>查看</el-button>
               </template>
             </el-table-column>
             <el-table-column label="备注" width="180" align="center" show-overflow-tooltip>

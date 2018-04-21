@@ -61,25 +61,25 @@
                 <el-col style="margin-bottom:10px;width:200px;">
                     <div>
                         中标时间:
-                        <el-date-picker type="date" size="mini" placeholder="选择日期" v-model="searchForm.biddingTime" style="width:130px;"></el-date-picker>
+                        <el-date-picker type="date" size="mini" placeholder="选择日期" value-format='yyyy-MM-dd' v-model="searchForm.biddingTime" style="width:130px;"></el-date-picker>
                     </div>
                 </el-col>
                 <el-col style="margin-bottom:10px;width:200px;">
                     <div>
                         合同时间:
-                        <el-date-picker type="date" size="mini" placeholder="选择日期" v-model="searchForm.contractTime" style="width:130px;"></el-date-picker>
+                        <el-date-picker type="date" size="mini" placeholder="选择日期"  value-format='yyyy-MM-dd' v-model="searchForm.contractTime" style="width:130px;"></el-date-picker>
                     </div>
                 </el-col>
                 <el-col style="margin-bottom:10px;width:260px;">
                     <div>
                         初设批复时间:
-                        <el-date-picker type="date" size="mini" placeholder="选择日期" v-model="searchForm.firstDesignTime" style="width:130px;"></el-date-picker>
+                        <el-date-picker type="date" size="mini" placeholder="选择日期" value-format='yyyy-MM-dd' v-model="searchForm.firstDesignTime" style="width:130px;"></el-date-picker>
                     </div>
                 </el-col>
                 <el-col style="margin-bottom:10px;width:260px;">
                     <div>
                         施设批复时间:
-                        <el-date-picker type="date" size="mini" placeholder="选择日期" v-model="searchForm.confirmTime" style="width:130px;"></el-date-picker>
+                        <el-date-picker type="date" size="mini" placeholder="选择日期" value-format='yyyy-MM-dd' v-model="searchForm.confirmTime" style="width:130px;"></el-date-picker>
                     </div>
                 </el-col>
                 <el-col style="margin-bottom:10px;width:260px;">

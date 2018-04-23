@@ -19,7 +19,7 @@
                 <el-tag size="mini">陪</el-tag>
               </template>
               <span style="cursor:pointer" @click="handleClipboard(scope.row[column.field],$event)">
-                {{ scope.row[column.field] }}
+                <span :class="[scope.row.weightEnum=='高'&&column.field=='name' ? activeClass : '']">{{ scope.row[column.field] }} </span>
               </span>
             </template>
             <template v-if="column.type=='button'">
@@ -75,7 +75,9 @@ export default {
         }
     },
     data() {
-        return {};
+        return {
+            activeClass:'activeClass'
+        };
     },
     created() {},
     methods: {
@@ -137,6 +139,9 @@ export default {
     // overflow: hidden;
     // text-overflow: ellipsis;
     // white-space: nowrap;
+}
+.activeClass{
+    color: red;
 }
 </style>
 

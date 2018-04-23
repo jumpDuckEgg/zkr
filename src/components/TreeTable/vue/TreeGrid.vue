@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-table v-loading='loading' :data="data" border :row-style="showTr" stripe size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
+        <el-table v-loading='loading' :data="data" border :row-style="showTr" :row-class-name="tableRowClassName" size='mini' border @selection-change="handleSelectionChange" @sort-change='tableSort'>
             <el-table-column type="selection" align="center" width="45"></el-table-column>
             <el-table-column :label="column.text" v-for="(column,index) in columns" :key="index" :prop="column.prop" :sortable='column.sort' :width="column.width?column.width:''" header-align='center' :align="column.textAlign" show-overflow-tooltip>
                 <template slot-scope="props">
@@ -151,6 +151,15 @@ export default {
         },
         showFileList(data) {
             this.$emit("fileList", data);
+        },
+        tableRowClassName({ row, rowIndex }) {
+            console.log(row);
+
+            if (row.parentId == 0) {
+                return "contract-row";
+            }
+
+            return "";
         }
     }
 };

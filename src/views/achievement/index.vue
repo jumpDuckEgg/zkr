@@ -669,7 +669,7 @@ export default {
         },
         showFileList(data) {
             this.fileListData = data;
-            console.log(data);
+            // console.log(data);
             this.showFileVisible = true;
         },
         downUrl(id) {

@@ -153,8 +153,6 @@ export default {
             this.$emit("fileList", data);
         },
         tableRowClassName({ row, rowIndex }) {
-            console.log(row);
-
             if (row.parentId == 0) {
                 return "contract-row";
             }

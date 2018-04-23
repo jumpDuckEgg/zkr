@@ -105,10 +105,10 @@ export default {
             if (newQuestion > 0 && newQuestion <= this.numPages) {
                 this.page = newQuestion;
             }
-            console.log(this.pageInput);
+            // console.log(this.pageInput);
         },
         clearFlag: function(newQuestion, oldQuestion) {
-            console.log(newQuestion);
+            // console.log(newQuestion);
             if (newQuestion) {
                 this.showVisible = false;
                 this.showDocument = false;
@@ -118,7 +118,7 @@ export default {
         }
     },
     created() {
-        console.log(this.fileList);
+        // console.log(this.fileList);
     },
     methods: {
         error: function(err) {

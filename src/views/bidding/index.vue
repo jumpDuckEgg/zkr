@@ -1508,7 +1508,7 @@ export default {
             }
         },
         enroll(data, status) {
-            console.log(data, status);
+            // console.log(data, status);
             let title = "";
             if (status == "yes") {
                 data.status = "确定报名的项目";

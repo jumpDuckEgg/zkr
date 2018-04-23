@@ -443,7 +443,7 @@ export default {
                 return "danger-row";
             }
             if (idValidityDate.getTime() - nowDay.getTime() < limitTime) {
-                console.log("warning-row");
+                // console.log("warning-row");
                 return "warning-row";
             }
             return "";

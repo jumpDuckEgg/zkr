@@ -90,7 +90,6 @@ export default {
             );
         },
         MaterialbeforeRemove(file, fileList) {
-            console.log("asdasd");
             // return this.$confirm(`确定移除 ${file.name}？`);
             // 文件移除的时候触发的方法
         },

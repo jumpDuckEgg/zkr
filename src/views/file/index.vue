@@ -248,7 +248,12 @@ export default {
         },
         turnUrl(url) {
             if (url) {
-                window.open("http://" + url);
+                let urlHeader = url.split(":");
+                if (urlHeader[0] == "https" || urlHeader[0] == "http") {
+                    window.open(url);
+                } else {
+                    window.open("http://" + url);
+                }
             } else {
                 this.$message({
                     type: "warning",

@@ -135,14 +135,14 @@
                     <el-col :span="11">
                         <el-form-item label="系统链接：">
                             <el-input size="mini" v-model="form.systemLink" clearable>
-                                <template slot="prepend">http://</template>
+
                             </el-input>
                         </el-form-item>
                     </el-col>
                     <el-col :span="11">
                         <el-form-item label="登入入口：">
                             <el-input size="mini" v-model="form.loginLink" clearable>
-                                <template slot="prepend">http://</template>
+
                             </el-input>
                         </el-form-item>
                     </el-col>
@@ -151,7 +151,6 @@
                     <el-col :span="11">
                         <el-form-item label="办事指南：">
                             <el-input size="mini" v-model="form.guide" clearable>
-                                <template slot="prepend">http://</template>
                             </el-input>
                         </el-form-item>
                     </el-col>
@@ -499,7 +498,12 @@ export default {
         },
         turnUrl(url) {
             if (url) {
-                window.open("http://" + url);
+                let urlHeader = url.split(":");
+                if (urlHeader[0] == "https" || urlHeader[0] == "http") {
+                    window.open(url);
+                } else {
+                    window.open("http://" + url);
+                }
             } else {
                 this.$message({
                     type: "warning",

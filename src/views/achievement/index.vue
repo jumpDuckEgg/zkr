@@ -217,7 +217,7 @@
             </div>
         </div>
         <!-- 新增业绩 -->
-        <el-dialog :visible.sync="dialogVisible" width="1000px" center lock-scroll top='5vh' @close='closeDialog'>
+        <el-dialog :visible.sync="dialogVisible" width="1000px" center lock-scroll   :close-on-click-modal='false' top='5vh' @close='closeDialog'>
             <div class="dialog-title">{{dialogTitle}}</div>
             <el-form ref="form" :model="form" :rules="rules" label-width="120px">
                 <el-row>

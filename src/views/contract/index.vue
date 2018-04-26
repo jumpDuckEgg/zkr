@@ -24,7 +24,7 @@
             </div>
         </div>
         <!-- 新增用户 -->
-        <el-dialog :visible.sync="dialogVisible" width="1200px" center lock-scroll @close='closeDialog'>
+        <el-dialog :visible.sync="dialogVisible" width="1200px"  :close-on-click-modal='false' center lock-scroll @close='closeDialog'>
             <div class="dialog-title">{{dialogTitle}}</div>
             <el-form ref="form" :model="form" :rules="rules" label-width="100px">
                 <el-row>

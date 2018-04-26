@@ -79,7 +79,7 @@
     </el-tabs>
 
     <!-- 新增文件 -->
-    <el-dialog :visible.sync="dialogVisible" width="530px" center lock-scroll @close='closeDialog'>
+    <el-dialog :visible.sync="dialogVisible" width="530px" center :close-on-click-modal='false' lock-scroll @close='closeDialog'>
       <div class="dialog-title">{{dialogTitle}}</div>
       <el-form ref="form" :model="form" :rules="rules" label-width="120px">
         <el-form-item label="文件类型：" prop="file_type_name">

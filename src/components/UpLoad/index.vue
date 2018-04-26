@@ -2,7 +2,7 @@
     <div class="upload">
         <el-row class="material" justify type="flex">
             <el-col>
-                <el-upload :action="materialUploadUrl" :headers="headData" :on-preview="handleMaterialPreview" :on-remove="handleMaterialRemove" :before-remove="MaterialbeforeRemove" multiple :limit="limitFlieNumber" :on-success="handleMaterialSuccess" :file-list="materialfileList" :before-upload="beforeMaterialUpload" :on-exceed="handleMaterialExceed" :on-progress="handleProgress">
+                <el-upload :action="materialUploadUrl" :headers="headData" :on-error='handleMaterialFail' :on-preview="handleMaterialPreview" :on-remove="handleMaterialRemove" :before-remove="MaterialbeforeRemove" multiple :limit="limitFlieNumber" :on-success="handleMaterialSuccess" :file-list="materialfileList" :before-upload="beforeMaterialUpload" :on-exceed="handleMaterialExceed" :on-progress="handleProgress">
                     <el-button size="small" type="primary">点击上传</el-button>
                 </el-upload>
             </el-col>
@@ -95,6 +95,13 @@ export default {
         },
         beforeMaterialUpload(file) {
             return true;
+        },
+        handleMaterialFail(err, file, fileList){
+            this.$message({
+                type:'error',
+                message:"上传失败，请把文件限制在100M以下"
+            })
+            this.$emit("update:buttonFlag", false);
         }
     }
 };

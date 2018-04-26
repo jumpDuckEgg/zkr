@@ -163,7 +163,7 @@
       </el-tab-pane>
     </el-tabs>
     <!-- 新增投标 -->
-    <el-dialog :visible.sync="dialogVisible" width="950px" center lock-scroll @close='closeDialog'>
+    <el-dialog :visible.sync="dialogVisible" width="950px"  :close-on-click-modal='false' center lock-scroll @close='closeDialog'>
       <div class="dialog-title">{{dialogTitle}}</div>
       <el-form ref="form" :model="form" :rules="rules" label-width="130px" :inline="true">
         <!-- 跟踪中 -->

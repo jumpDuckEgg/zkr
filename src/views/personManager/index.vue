@@ -195,8 +195,8 @@
             <el-option label="电气" value="电气"></el-option>
             <el-option label="建筑" value="建筑"></el-option>
             <el-option label="给排水" value="给排水"></el-option>
-            <el-option label="暖通" value="电气"></el-option>
-            <el-option label="岩土" value="暖通"></el-option>
+            <el-option label="暖通" value="暖通"></el-option>
+            <el-option label="岩土" value="岩土"></el-option>
             <el-option label="动力" value="动力"></el-option>
             <el-option label="环保" value="环保"></el-option>
             <el-option label="建造师" value="建造师"></el-option>

@@ -39,7 +39,7 @@
             </el-table-column>
           </el-table>
           <div class="pagination-box">
-            <el-pagination small layout="prev, pager, next,sizes,total" :total="total" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+            <el-pagination small layout="prev, pager, next,sizes,total" :total="total" :current-page.sync="currentPage" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
             </el-pagination>
           </div>
         </div>
@@ -71,7 +71,7 @@
             </el-table-column>
           </el-table>
           <div class="pagination-box">
-            <el-pagination small layout="prev, pager, next,sizes,total" :total="sqlData.total" :page-sizes="[10, 15, 20,25]" :page-size="sqlData.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+            <el-pagination small layout="prev, pager, next,sizes,total" :total="sqlData.total" :current-page.sync="sqlData.currentPage" :page-sizes="[10, 15, 20,25]" :page-size="sqlData.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
             </el-pagination>
           </div>
         </div>

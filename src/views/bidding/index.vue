@@ -26,7 +26,7 @@
         </el-row>
         <normaltable tableType='跟踪中的项目' @fileList='showFileList' :loading='trackTable.loading' :tableMaxWidth='trackTable.tableMaxWidth' :columns='trackColumns' :tableData='trackTableData' @multipleSelection='multipleSelections' @sort='tableSort' @enroll='enroll'></normaltable>
         <div class="pagination-box">
-          <el-pagination background layout="prev, pager, next,sizes,total" :total="trackTable.total" :page-sizes="[10, 15, 20,25]" :page-size="trackTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+          <el-pagination background layout="prev, pager, next,sizes,total" :total="trackTable.total" :current-page.sync="trackTable.currentPage" :page-sizes="[10, 15, 20,25]" :page-size="trackTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
           </el-pagination>
         </div>
       </el-tab-pane>
@@ -55,7 +55,7 @@
         </el-row>
         <normaltable tableType='确定报名的项目' @fileList='showFileList' :loading='checkTable.loading' :tableMaxWidth='checkTable.tableMaxWidth' :columns='checkColumns' :tableData='checkTableData' @multipleSelection='multipleSelections' @sort='tableSort'></normaltable>
         <div class="pagination-box">
-          <el-pagination background layout="prev, pager, next,sizes,total" :total="checkTable.total" :page-sizes="[10, 15, 20,25]" :page-size="checkTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+          <el-pagination background layout="prev, pager, next,sizes,total" :total="checkTable.total" :current-page.sync="checkTable.currentPage" :page-sizes="[10, 15, 20,25]" :page-size="checkTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
           </el-pagination>
         </div>
       </el-tab-pane>
@@ -80,7 +80,7 @@
         </el-row>
         <normaltable tableType='确定不报名的项目' @fileList='showFileList' :loading='unCheckTable.loading' :tableMaxWidth='unCheckTable.tableMaxWidth' :columns='unCheckColumns' :tableData='unCheckTableData' @multipleSelection='multipleSelections' @sort='tableSort'></normaltable>
         <div class="pagination-box">
-          <el-pagination background layout="prev, pager, next,sizes,total" :total="unCheckTable.total" :page-sizes="[10, 15, 20,25]" :page-size="unCheckTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+          <el-pagination background layout="prev, pager, next,sizes,total" :total="unCheckTable.total" :current-page.sync="unCheckTable.currentPage" :page-sizes="[10, 15, 20,25]" :page-size="unCheckTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
           </el-pagination>
         </div>
       </el-tab-pane>
@@ -106,7 +106,7 @@
         </el-row>
         <normaltable tableType='已投标的项目中标' @fileList='showFileList' :loading='successTable.loading' :tableMaxWidth='successTable.tableMaxWidth' :columns='successColumns' :tableData='successTableData' @multipleSelection='multipleSelections' @sort='tableSort'></normaltable>
         <div class="pagination-box">
-          <el-pagination background layout="prev, pager, next,sizes,total" :total="successTable.total" :page-sizes="[10, 15, 20,25]" :page-size="successTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+          <el-pagination background layout="prev, pager, next,sizes,total" :total="successTable.total" :current-page.sync="successTable.currentPage" :page-sizes="[10, 15, 20,25]" :page-size="successTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
           </el-pagination>
         </div>
       </el-tab-pane>
@@ -131,7 +131,7 @@
         </el-row>
         <normaltable tableType='已投标的项目中标' @fileList='showFileList' :loading='failTable.loading' :tableMaxWidth='failTable.tableMaxWidth' :columns='failColumns' :tableData='failTableData' @multipleSelection='multipleSelections' @sort='tableSort'></normaltable>
         <div class="pagination-box">
-          <el-pagination background layout="prev, pager, next,sizes,total" :total="failTable.total" :page-sizes="[10, 15, 20,25]" :page-size="failTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+          <el-pagination background layout="prev, pager, next,sizes,total" :total="failTable.total" :current-page.sync="failTable.currentPage" :page-sizes="[10, 15, 20,25]" :page-size="failTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
           </el-pagination>
         </div>
       </el-tab-pane>
@@ -157,7 +157,7 @@
         </el-row>
         <normaltable tableType='已投标的项目中标' @fileList='showFileList' :loading='abandonTable.loading' :tableMaxWidth='abandonTable.tableMaxWidth' :columns='abandonColumns' :tableData='abandonTableData' @multipleSelection='multipleSelections' @sort='tableSort'></normaltable>
         <div class="pagination-box">
-          <el-pagination background layout="prev, pager, next,sizes,total" :total="abandonTable.total" :page-sizes="[10, 15, 20,25]" :page-size="abandonTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+          <el-pagination background layout="prev, pager, next,sizes,total" :total="abandonTable.total" :current-page.sync="abandonTable.currentPage" :page-sizes="[10, 15, 20,25]" :page-size="abandonTable.pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
           </el-pagination>
         </div>
       </el-tab-pane>

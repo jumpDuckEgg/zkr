@@ -40,7 +40,7 @@
                 </el-table-column>
             </el-table>
             <div class="pagination-box">
-                <el-pagination small layout="prev, pager, next" :total="total" :page-size="pageSize" @current-change="handleCurrentChange">
+                <el-pagination small layout="prev, pager, next" :total="total" :current-page.sync="currentPage" :page-size="pageSize" @current-change="handleCurrentChange">
                 </el-pagination>
             </div>
         </div>

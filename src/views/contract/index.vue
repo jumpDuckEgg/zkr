@@ -19,7 +19,7 @@
         <div class="table-box">
             <tree-grid :columns="columns" @fileList='showFileList' :loading='loading' :tree-structure="true" :data-source="tableData" style="margin-top:10px;" @sort='tableSort' @multipleSelection='handleSelectionChange'></tree-grid>
             <div class="pagination-box">
-                <el-pagination small layout="prev, pager,next,sizes,total" :total="total" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
+                <el-pagination small layout="prev, pager,next,sizes,total" :current-page.sync="currentPage" :total="total" :page-sizes="[10, 15, 20,25]" :page-size="pageSize" @size-change="handleSizeChange" @current-change="handleCurrentChange">
                 </el-pagination>
             </div>
         </div>

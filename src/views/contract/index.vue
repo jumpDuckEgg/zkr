@@ -75,13 +75,13 @@
                 </el-row>
                 <el-row>
                     <el-col :span="12">
-                        <el-form-item label="工作内容：" prop="content">
-                            <el-input size="mini" type="textarea" v-model="form.content" clearable></el-input>
+                        <el-form-item label="工作内容/工程规模：" prop="content">
+                            <el-input size="mini" type="textarea" rows="3" v-model="form.content" clearable ></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
                         <el-form-item label="工程进度：" prop="progress">
-                            <el-input size="mini" type="textarea" v-model="form.progress" clearable></el-input>
+                            <el-input size="mini" type="textarea" rows="3" v-model="form.progress" clearable></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -174,9 +174,9 @@
             </div>
             <div class="content">
                 <svg-icon icon-class='code'></svg-icon>
-                工作内容：{{multipleSelection[0]?multipleSelection[0].content:''}}
+                工作内容/工程规模：{{multipleSelection[0]?multipleSelection[0].content:''}}
                 <template v-if="multipleSelection[0]&& !multipleSelection[0].content">
-                    <el-tag size="mini" type="danger">暂无工作内容</el-tag>
+                    <el-tag size="mini" type="danger">暂无工作内容/工程规模</el-tag>
                 </template>
             </div>
             <div class="content">
@@ -300,7 +300,7 @@ export default {
                 {
                     text: "合同名称",
                     field: "name",
-                    width: "130",
+                    width: "330",
                     type: "text",
                     prop: "name",
                     sort: "custom",
@@ -343,9 +343,9 @@ export default {
                     textAlign: "center"
                 },
                 {
-                    text: "工作内容",
+                    text: "工作内容/工程规模",
                     field: "content",
-                    width: "130",
+                    width: "230",
                     type: "text",
                     sort: false,
                     textAlign: "center"
@@ -358,30 +358,30 @@ export default {
                     sort: false,
                     textAlign: "center"
                 },
-                {
-                    text: "金额说明（勘察设计费）",
-                    field: "priceDesc",
-                    width: "160",
-                    type: "text",
-                    sort: false,
-                    textAlign: "center"
-                },
-                {
-                    text: "支付条款",
-                    field: "paymentTerms",
-                    width: "120",
-                    type: "text",
-                    sort: false,
-                    textAlign: "center"
-                },
-                {
-                    text: "支付明细",
-                    field: "paymentItems",
-                    width: "120",
-                    type: "text",
-                    sort: false,
-                    textAlign: "center"
-                },
+                // {
+                //     text: "金额说明（勘察设计费）",
+                //     field: "priceDesc",
+                //     width: "160",
+                //     type: "text",
+                //     sort: false,
+                //     textAlign: "center"
+                // },
+                // {
+                //     text: "支付条款",
+                //     field: "paymentTerms",
+                //     width: "120",
+                //     type: "text",
+                //     sort: false,
+                //     textAlign: "center"
+                // },
+                // {
+                //     text: "支付明细",
+                //     field: "paymentItems",
+                //     width: "120",
+                //     type: "text",
+                //     sort: false,
+                //     textAlign: "center"
+                // },
                 {
                     text: "文件下载",
                     field: "paymentItems",
@@ -819,7 +819,7 @@ export default {
 <style lang="scss" scoped>
 .table-box {
     margin-top: 10px;
-    max-width: 1696px;
+    max-width: 1596px;
 }
 .input_width {
     width: 180px;

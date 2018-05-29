@@ -45,7 +45,7 @@
             {{scope.row.idValidityDate}}
           </template>
         </el-table-column>
-        <el-table-column label="毕业信息" width="145" align='center'>
+        <el-table-column label="毕业信息" width="205" align='center'>
           <template slot-scope="scope">
             <div class="overWord hand" @click="handleClipboard(scope.row.graduationInfo,$event)">
               {{scope.row.graduationInfo}}
@@ -79,7 +79,7 @@
             {{scope.row.validityPeriod}}
           </template>
         </el-table-column>
-        <el-table-column prop="currentPosition" label="当前职位" width="100" align='center'>
+        <el-table-column prop="currentPosition" label="证书编号" width="100" align='center'>
         </el-table-column>
         <el-table-column prop="social_security" label="社保所在地" width="105" align='center' sortable='custom'>
           <template slot-scope="scope">
@@ -93,13 +93,13 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="获奖情况" width="130" align='center'>
+        <!-- <el-table-column label="获奖情况" width="130" align='center'>
           <template slot-scope="scope">
             <div class="overWord">
               {{scope.row.winnings}}
             </div>
           </template>
-        </el-table-column>
+        </el-table-column> -->
         <el-table-column label="备注" width="150" align="center">
           <template slot-scope="scope">
             <div class="overWord">
@@ -126,7 +126,7 @@
         <el-form-item label="身份证有效期:" prop="idValidityDate" label-width="110px">
           <el-date-picker type="date" size="mini" value-format='yyyy-MM-dd HH:mm:ss' placeholder="选择日期" v-model="form.idValidityDate" style="width:130px;"></el-date-picker>
         </el-form-item>
-        <el-form-item label="当前职位:" prop="currentPosition" label-width="80px">
+        <el-form-item label="证书编号:" prop="currentPosition" label-width="80px">
           <el-input size="mini" v-model="form.currentPosition" clearable style="width:110px;"></el-input>
         </el-form-item>
         <el-form-item label="学历:" prop="diploma">
@@ -246,9 +246,9 @@
           </div>
           <div>
             <svg-icon icon-class='personal-center' style="color:#a7a7a7"></svg-icon>
-            当前职位：{{multipleSelection[0]?multipleSelection[0].currentPosition:''}}
+            证书编号：{{multipleSelection[0]?multipleSelection[0].currentPosition:''}}
             <template v-if="multipleSelection[0]&& !multipleSelection[0].currentPosition">
-              <el-tag size="mini" type="danger">暂无当前职位</el-tag>
+              <el-tag size="mini" type="danger">暂无证书编号</el-tag>
             </template>
           </div>
         </el-col>
@@ -764,7 +764,7 @@ export default {
 <style lang="scss" scoped>
 .table-box {
   margin-top: 10px;
-  max-width: 1677px;
+  max-width: 1607px;
 }
 .input_width {
   width: 200px;
